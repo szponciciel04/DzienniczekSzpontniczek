@@ -6,8 +6,8 @@ import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 
 private const val HEBE_APP_NAME = "DzienniczekPlus 2.0"
-private const val HEBE_APP_VERSION = "25.08.11 (G)"
-private const val HEBE_APP_VERSION_CODE = "756"
+private const val HEBE_APP_VERSION = "26.01.01 (G)"
+private const val HEBE_APP_VERSION_CODE = "890"
 
 private val TOKEN_PREFIXES = mapOf(
     "3S1" to "https://lekcjaplus.vulcan.net.pl",

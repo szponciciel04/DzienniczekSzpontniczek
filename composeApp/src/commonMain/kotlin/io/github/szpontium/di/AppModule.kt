@@ -11,6 +11,7 @@ import io.github.szpontium.viewmodel.GradesViewModel
 import io.github.szpontium.viewmodel.HomeworkViewModel
 import io.github.szpontium.viewmodel.LoginViewModel
 import io.github.szpontium.viewmodel.NotesViewModel
+import io.github.szpontium.viewmodel.StartViewModel
 import io.github.szpontium.viewmodel.TimetableViewModel
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
@@ -29,4 +30,5 @@ val appModule = module {
     viewModel { HomeworkViewModel(get()) }
     viewModel { NotesViewModel(get()) }
     viewModel { AnnouncementsViewModel(get()) }
+    viewModel { StartViewModel(get()) }
 }

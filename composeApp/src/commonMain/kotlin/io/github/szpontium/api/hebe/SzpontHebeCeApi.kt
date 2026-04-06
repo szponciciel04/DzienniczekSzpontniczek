@@ -8,8 +8,8 @@ import kotlinx.serialization.json.put
 import kotlinx.serialization.json.putJsonArray
 
 private const val HEBECE_APP_NAME = "DzienniczekPlus 3.0"
-private const val HEBECE_APP_VERSION = "25.12.00 (G)"
-private const val HEBECE_APP_VERSION_CODE = "880"
+private const val HEBECE_APP_VERSION = "26.03.02 (G)"
+private const val HEBECE_APP_VERSION_CODE = "936"
 private const val HEBECE_API_BASE_URL = "https://lekcjaplus.vulcan.net.pl"
 
 /**
