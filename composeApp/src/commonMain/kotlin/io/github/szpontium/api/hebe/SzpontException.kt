@@ -1,0 +1,21 @@
+package io.github.szpontium.api.hebe
+
+open class SzpontApiException(message: String) : Exception(message)
+
+class FailedRequestException(message: String) : SzpontApiException(message)
+class HttpUnsuccessfulStatusException(message: String) : SzpontApiException(message)
+class ExpiredTokenException(message: String) : SzpontApiException(message)
+class WrongPinException(message: String) : SzpontApiException(message)
+class WrongTokenException(message: String) : SzpontApiException(message)
+class UsedTokenException(message: String) : SzpontApiException(message)
+class InvalidHeaderException(message: String) : SzpontApiException(message)
+class MissingHeaderException(message: String) : SzpontApiException(message)
+class InvalidBodyModelException(message: String) : SzpontApiException(message)
+class InvalidSignatureException(message: String) : SzpontApiException(message)
+class CertificateNotFoundException(message: String) : SzpontApiException(message)
+class EntityNotFoundException(message: String) : SzpontApiException(message)
+class ConstraintViolationException(message: String) : SzpontApiException(message)
+class InvalidParameterValueException(message: String) : SzpontApiException(message)
+class MissingUnitSymbolException(message: String) : SzpontApiException(message)
+class InternalServerErrorException(message: String) : SzpontApiException(message)
+class ResponseInvalidContentTypeException : SzpontApiException("Invalid content type in response")

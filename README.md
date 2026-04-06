@@ -1,35 +1,48 @@
-This is a Kotlin Multiplatform project targeting Android, iOS.
+# Dzienniczek Szpontniczek
 
-* [/composeApp](./composeApp/src) is for code that will be shared across your Compose Multiplatform applications.
-  It contains several subfolders:
-  - [commonMain](./composeApp/src/commonMain/kotlin) is for code that’s common for all targets.
-  - Other folders are for Kotlin code that will be compiled for only the platform indicated in the folder name.
-    For example, if you want to use Apple’s CoreCrypto for the iOS part of your Kotlin app,
-    the [iosMain](./composeApp/src/iosMain/kotlin) folder would be the right place for such calls.
-    Similarly, if you want to edit the Desktop (JVM) specific part, the [jvmMain](./composeApp/src/jvmMain/kotlin)
-    folder is the appropriate location.
+[![Skala szpontu](https://img.shields.io/badge/szpont_kwantowy-w_skali_szpontu-blue)](https://github.com/szponciciel04/DzienniczekSzpontniczek)
+[![Repo size](https://img.shields.io/github/repo-size/szponciciel04/DzienniczekSzpontniczek)](https://github.com/szponciciel04/DzienniczekSzpontniczek)
+[![Last commit](https://img.shields.io/github/last-commit/szponciciel04/DzienniczekSzpontniczek)](https://github.com/szponciciel04/DzienniczekSzpontniczek/commits)
+[![Issues](https://img.shields.io/github/issues/szponciciel04/DzienniczekSzpontniczek)](https://github.com/szponciciel04/DzienniczekSzpontniczek/issues)
+[![Top language](https://img.shields.io/github/languages/top/szponciciel04/DzienniczekSzpontniczek)](https://github.com/szponciciel04/DzienniczekSzpontniczek)
 
-* [/iosApp](./iosApp/iosApp) contains iOS applications. Even if you’re sharing your UI with Compose Multiplatform,
-  you need this entry point for your iOS app. This is also where you should add SwiftUI code for your project.
+Dzienniczek Szpontniczek (codename: Szpontium) to pierwszy w pełni naszponcony client eduVULCAN
 
-### Build and Run Android Application
+Projekt został całkowicie przyszponcony w paru promptach przy użyciu Szpont Maszyny z modelem Claude Sonnet 4.6
 
-To build and run the development version of the Android app, use the run configuration from the run widget
-in your IDE’s toolbar or build it directly from the terminal:
-- on macOS/Linux
-  ```shell
-  ./gradlew :composeApp:assembleDebug
-  ```
-- on Windows
-  ```shell
-  .\gradlew.bat :composeApp:assembleDebug
-  ```
+![Szpont](./artwork/szpont-detected.jpg)
 
-### Build and Run iOS Application
+## Funkcje aplikacji
 
-To build and run the development version of the iOS app, use the run configuration from the run widget
-in your IDE’s toolbar or open the [/iosApp](./iosApp) directory in Xcode and run it from there.
+Dzienniczek Szpontniczek pozwala korzystać z najważniejszych funkcji e-dziennika VULCAN i eduVULCAN w jednej aplikacji.
 
----
+- logowanie i rejestracja urządzenia dla Dzienniczka VULCAN oraz eduVULCAN,
+- podgląd ocen, średnich i podsumowań okresowych,
+- przegląd sprawdzianów, kartkówek i zadań domowych,
+- plan lekcji (w tym zastępstwa) oraz lekcje zaplanowane i zrealizowane,
+- frekwencja wraz ze statystykami miesięcznymi i przedmiotowymi,
+- uwagi, ogłoszenia i wiadomości,
+- informacje o nauczycielach, szkole, wycieczkach, wydarzeniach i dniach wolnych.
 
-Learn more about [Kotlin Multiplatform](https://www.jetbrains.com/help/kotlin-multiplatform-dev/get-started.html)…
+## Skala Szpontu
+
+<img src="./artwork/szpont-scale.png" alt="Szpont" width="400">
+
+Cały projekt uplasował się na miejscu "Szpont Kwantowy" w Skali Szpontu
+
+## Dokumentacja
+
+Więcej szczegółów znajdziesz w dokumentacji projektu:
+
+- [Getting started](docs/getting-started.md)
+- [Basic usage](docs/basic-usage.md)
+- [Logowanie i klient HebeCE](docs/login-and-hebece-client.md)
+- [Flow logowania eduVULCAN](docs/eduvulcan-login-flow.md)
+- [Prometheus login helper](docs/prometheus-login-helper.md)
+
+UWAGA! ta dokumentacja jest całkowcie przyszponcona przez Szpont Maszynę.
+
+## Podziękowania
+
+Serdeczne podziękowania dla Szpont Maszyny która pozwoliła naszponcić cały ten projekt 
+
