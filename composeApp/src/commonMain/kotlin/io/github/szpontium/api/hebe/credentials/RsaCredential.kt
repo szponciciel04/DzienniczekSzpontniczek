@@ -1,6 +1,6 @@
 package io.github.szpontium.api.hebe.credentials
 
-import io.github.szpontium.api.hebe.signer.HebeX509Signer
+import io.github.szpontium.api.hebe.signer.HebeSzpontSigner
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
@@ -24,13 +24,12 @@ class RsaCredential(
             restUrl: String? = null,
             notificationToken: String? = null
         ): RsaCredential {
-            val (publicKey, privateKey, _) = HebeX509Signer.generateKeyPair()
-            val (certificate, fingerprint) = HebeX509Signer.generateCertificate(publicKey, privateKey)
+            val (publicKey, privatePem, fingerprint) = HebeSzpontSigner.generateKeyPair()
             return RsaCredential(
-                type = "X509",
+                type = "RSA_PEM",
                 restUrl = restUrl,
-                certificate = certificate,
-                privateKey = privateKey,
+                certificate = publicKey,
+                privateKey = privatePem,
                 fingerprint = fingerprint,
                 notificationToken = notificationToken,
                 deviceId = Uuid.random().toString(),

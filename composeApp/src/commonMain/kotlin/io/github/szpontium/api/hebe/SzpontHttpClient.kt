@@ -4,7 +4,7 @@ package io.github.szpontium.api.hebe
 
 import io.github.szpontium.api.hebe.credentials.ICredential
 import io.github.szpontium.api.hebe.models.EnvelopeResponse
-import io.github.szpontium.api.hebe.signer.HebeX509Signer
+import io.github.szpontium.api.hebe.signer.HebeSzpontSigner
 import io.ktor.client.HttpClient
 import io.ktor.client.request.header
 import io.ktor.client.request.parameter
@@ -79,7 +79,7 @@ class SzpontHttpClient(
         val body = if (payload != null) buildBody(payload) else null
         val now = Clock.System.now()
 
-        val signatureHeaders = HebeX509Signer.getSignatureHeaders(
+        val signatureHeaders = HebeSzpontSigner.getSignatureHeaders(
             keyId = credential.fingerprint,
             privatePem = credential.privateKey,
             body = body,
