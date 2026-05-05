@@ -4,5 +4,9 @@
 <dict>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
+	<key>CFBundleDisplayName</key>
+	<string>Szpontniczek</string>
+	<key>CFBundleName</key>
+	<string>Szpontniczek</string>
 </dict>
 </plist>
