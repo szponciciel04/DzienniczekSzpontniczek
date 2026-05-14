@@ -95,7 +95,7 @@ class PrometheusLoginHelper {
 
         // 3. Właściwe logowanie — bez redirectów, żeby odczytać nagłówek Location
         val formBody = buildString {
-            append("Alias=").append(UrlEncoderUtil.encode(login))
+            append("UserName=").append(UrlEncoderUtil.encode(login))
             append("&Password=").append(UrlEncoderUtil.encode(password))
             append("&captcha-response=").append(UrlEncoderUtil.encode(captchaResponse))
             append("&__RequestVerificationToken=").append(UrlEncoderUtil.encode(csrfToken))
@@ -137,7 +137,7 @@ class PrometheusLoginHelper {
         return try {
             val body = httpClient.post("https://eduvulcan.pl/Account/QueryUserInfo") {
                 contentType(ContentType.Application.FormUrlEncoded)
-                setBody("alias=${UrlEncoderUtil.encode(username)}")
+                setBody("UserName=${UrlEncoderUtil.encode(username)}")
             }.bodyAsText()
             json.parseToJsonElement(body)
                 .jsonObject["data"]?.jsonObject
