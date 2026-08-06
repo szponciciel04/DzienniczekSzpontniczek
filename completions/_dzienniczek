@@ -1,0 +1,24 @@
+#compdef dzienniczek
+
+_dzienniczek() {
+  local -a commands
+  commands=(
+    'login:log in to VULCAN, eduVULCAN, or Librus'
+    'logout:remove a local profile'
+    'profile:manage profiles'
+    'account:manage student accounts'
+    'dashboard:show the student dashboard'
+    'grades:list grades, averages, or summaries'
+    'schedule:show the timetable'
+    'exams:list exams'
+    'homework:list homework'
+    'presence:show attendance and statistics'
+    'messages:show message folders'
+    'notes:list notes'
+    'announcements:list announcements'
+    'capabilities:print the machine-readable command inventory'
+  )
+  _describe 'command' commands
+}
+
+_dzienniczek "$@"

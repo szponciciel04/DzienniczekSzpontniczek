@@ -8,6 +8,19 @@
 
 Dzienniczek Szpontniczek (codename: Szpontium) to pierwszy w pełni naszponcony client eduVULCAN
 
+## CLI
+
+Repozytorium zawiera również `dzienniczek`: wieloplatformowy interfejs wiersza poleceń dla VULCAN, eduVULCAN i Librus. Działa na Linuxie, macOS (Homebrew) oraz Windows przez WSL, obsługuje wyjście JSON i stabilne kody wyjścia dla Codex, Claude Code, OpenClaw i Hermes.
+
+```sh
+./scripts/install.sh
+dzienniczek login eduvulcan --username USER --password PASS
+dzienniczek dashboard
+dzienniczek capabilities --json
+```
+
+Pełna instrukcja: [docs/cli.md](docs/cli.md).
+
 Projekt został całkowicie przyszponcony w paru promptach przy użyciu Szpont Maszyny z modelem Claude Sonnet 4.6
 
 ![Szpont](./artwork/szpont-detected.jpg)
@@ -46,4 +59,3 @@ UWAGA! ta dokumentacja jest całkowcie przyszponcona przez Szpont Maszynę.
 
 Serdeczne podziękowania dla Szpont Maszyny która pozwoliła naszponcić cały ten projekt 
 Dziękujemy aplikacji Szkolny.eu za użycie kodu do działania dziennika Librus.
-

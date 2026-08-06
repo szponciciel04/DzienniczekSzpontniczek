@@ -37,6 +37,8 @@ fun decodeJWT(jwt: String): JwtPayload {
 data class PrometheusLoginResult(
     /** Mapa tenant (symbol) → tenant JWT token z Tokens[] */
     val tenantTokens: Map<String, String>,
+    /** Wszystkie tokeny, bez utraty wielu uczniów w tym samym tenant. */
+    val allTenantTokens: List<String>,
     /** Główny accessToken z pola AccessToken w /api/ap */
     val mainAccessToken: String,
     /** Ciastka sesyjne */
@@ -129,6 +131,7 @@ class PrometheusLoginHelper {
 
         return PrometheusLoginResult(
             tenantTokens = tenantTokens,
+            allTenantTokens = apData.tokens,
             mainAccessToken = apData.accessToken,
             cookies = cookieStorage.get(io.ktor.http.Url("https://eduvulcan.pl"))
         )

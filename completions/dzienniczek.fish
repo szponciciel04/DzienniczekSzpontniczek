@@ -1,0 +1,2 @@
+set -l commands login logout profile account dashboard accounts periods heartbeat addressbook announcements completed-lessons duties exams grades homework kindergarten-hours kindergarten-teachers lucky-number meal-menu meetings notes planned-lessons presence messages message schedule schedule-extra school-info teachers timeslots trips events vacations push credential subjects users classrooms notices capabilities config version help
+complete -c dzienniczek -f -n 'not __fish_seen_subcommand_from $commands' -a "$commands"

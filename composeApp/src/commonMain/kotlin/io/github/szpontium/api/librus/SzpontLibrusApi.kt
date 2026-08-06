@@ -82,11 +82,11 @@ class SzpontLibrusApi(
         return obj["Token"]?.jsonPrimitive?.content ?: error("Failed to get auto login token")
     }
 
-    suspend fun getSynergiaMessages(token: String, tab: io.github.szpontium.viewmodel.MessageTab): List<io.github.szpontium.ui.model.UiMessage> {
+    suspend fun getSynergiaMessages(token: String, tab: LibrusMessageFolder): List<LibrusWebMessage> {
         val folder = when (tab) {
-            io.github.szpontium.viewmodel.MessageTab.RECEIVED -> "5"
-            io.github.szpontium.viewmodel.MessageTab.SENT -> "6"
-            io.github.szpontium.viewmodel.MessageTab.DELETED -> "7"
+            LibrusMessageFolder.RECEIVED -> "5"
+            LibrusMessageFolder.SENT -> "6"
+            LibrusMessageFolder.DELETED -> "7"
         }
         val loginUrl = "https://synergia.librus.pl/loguj/token/$token/przenies/uczen/widok/wiadomosci/$folder"
         
@@ -100,7 +100,7 @@ class SzpontLibrusApi(
         } else html
 
         val doc = Ksoup.parse(finalHtml)
-        val messages = mutableListOf<io.github.szpontium.ui.model.UiMessage>()
+        val messages = mutableListOf<LibrusWebMessage>()
         
         doc.select(".decorated.stretch tbody > tr").forEach { tr ->
             val cells = tr.select("td")
@@ -126,7 +126,7 @@ class SzpontLibrusApi(
             }
             
             messages.add(
-                io.github.szpontium.ui.model.UiMessage(
+                LibrusWebMessage(
                     id = id,
                     title = subject,
                     senderOrRecipient = sender,
@@ -251,3 +251,16 @@ class SzpontLibrusApi(
         return json.decodeFromString<LibrusClassroomsResponse>(responseText).classrooms
     }
 }
+
+@Serializable
+enum class LibrusMessageFolder { RECEIVED, SENT, DELETED }
+
+@Serializable
+data class LibrusWebMessage(
+    val id: String,
+    val title: String,
+    val senderOrRecipient: String,
+    val date: LocalDateTime? = null,
+    val isUnread: Boolean = false,
+    val hasAttachments: Boolean = false
+)
