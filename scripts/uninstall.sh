@@ -5,8 +5,8 @@ install_prefix=${DZIENNICZEK_PREFIX:-"$HOME/.local"}
 target="$install_prefix/lib/dzienniczek-0.2.0"
 link="$install_prefix/bin/dzienniczek"
 
-if [ -L "$link" ] && [ "$(readlink "$link")" = "$target/bin/dzienniczek" ]; then
-  unlink "$link"
+if [ -f "$link" ] && grep -q "Dzienniczek CLI local launcher" "$link"; then
+  mv "$link" "$link.uninstalled"
 fi
 if [ -d "$target" ]; then
   mv "$target" "$target.uninstalled"

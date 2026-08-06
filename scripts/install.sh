@@ -4,6 +4,12 @@ set -eu
 project_dir=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 install_prefix=${DZIENNICZEK_PREFIX:-"$HOME/.local"}
 
+if [ -x /opt/homebrew/opt/openjdk@17/bin/java ]; then
+  JAVA_HOME=/opt/homebrew/opt/openjdk@17
+  PATH="$JAVA_HOME/bin:$PATH"
+  export JAVA_HOME PATH
+fi
+
 while [ "$#" -gt 0 ]; do
   case "$1" in
     --prefix) install_prefix=$2; shift 2 ;;
@@ -37,6 +43,6 @@ if [ -e "$target" ]; then
   mv "$target" "$backup"
 fi
 cp -R "$project_dir/cli/build/install/dzienniczek" "$target"
-ln -sfn "$target/bin/dzienniczek" "$install_prefix/bin/dzienniczek"
+install -m 0755 "$project_dir/scripts/dzienniczek-launcher.sh" "$install_prefix/bin/dzienniczek"
 
 echo "Installed $install_prefix/bin/dzienniczek"

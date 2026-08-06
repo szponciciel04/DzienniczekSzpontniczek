@@ -20,6 +20,7 @@ For a local checkout without a tap:
 ```
 
 Add `~/.local/bin` to `PATH` if it is not already present.
+The local launcher automatically uses Homebrew's `openjdk@17`; override it with `DZIENNICZEK_JAVA_HOME` when needed.
 
 ### Linux and Windows through WSL
 
