@@ -131,6 +131,9 @@ fun StartScreen(
         item {
             ElevatedCard(
                 onClick = { onNavigate(Route.Grades) },
+                colors = CardDefaults.elevatedCardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainerLow
+                ),
                 modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
@@ -167,6 +170,9 @@ fun StartScreen(
         item {
             ElevatedCard(
                 onClick = { onNavigate(Route.Exams) },
+                colors = CardDefaults.elevatedCardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainerLow
+                ),
                 modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
@@ -188,7 +194,8 @@ fun StartScreen(
                             state.upcomingExams.forEachIndexed { index, exam ->
                                 ExamCard(
                                     exam = exam,
-                                    shape = expressiveGroupShape(index = index, count = state.upcomingExams.size)
+                                    shape = expressiveGroupShape(index = index, count = state.upcomingExams.size),
+                                    containerColor = MaterialTheme.colorScheme.surfaceContainerHighest
                                 )
                                 if (index < state.upcomingExams.size - 1) {
                                     Spacer(Modifier.height(3.dp))
@@ -205,6 +212,9 @@ fun StartScreen(
         item {
             ElevatedCard(
                 onClick = { onNavigate(Route.Homework) },
+                colors = CardDefaults.elevatedCardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainerLow
+                ),
                 modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
@@ -226,7 +236,8 @@ fun StartScreen(
                             state.upcomingHomework.forEachIndexed { index, hw ->
                                 HomeworkCard(
                                     hw = hw,
-                                    shape = expressiveGroupShape(index = index, count = state.upcomingHomework.size)
+                                    shape = expressiveGroupShape(index = index, count = state.upcomingHomework.size),
+                                    containerColor = MaterialTheme.colorScheme.surfaceContainerHighest
                                 )
                                 if (index < state.upcomingHomework.size - 1) {
                                     Spacer(Modifier.height(3.dp))

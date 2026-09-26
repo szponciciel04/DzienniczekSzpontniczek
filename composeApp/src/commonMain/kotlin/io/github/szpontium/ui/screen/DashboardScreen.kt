@@ -138,7 +138,7 @@ fun DashboardScreen(
                         color = if (isSelected)
                             MaterialTheme.colorScheme.primaryContainer
                         else
-                            MaterialTheme.colorScheme.surfaceContainerLow,
+                            MaterialTheme.colorScheme.surfaceContainerHigh,
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(vertical = 2.dp)

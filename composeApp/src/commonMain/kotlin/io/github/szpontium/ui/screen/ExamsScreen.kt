@@ -26,6 +26,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -132,13 +133,17 @@ private fun DayHeader(date: LocalDate) {
 }
 
 @Composable
-fun ExamCard(exam: Exam, shape: Shape = MaterialTheme.shapes.medium) {
+fun ExamCard(
+    exam: Exam,
+    shape: Shape = MaterialTheme.shapes.medium,
+    containerColor: Color = MaterialTheme.colorScheme.surfaceContainerLow
+) {
     val isTest = exam.type.lowercase().contains("kartkówka") || exam.typeId == 2
 
     Card(
         shape = shape,
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainerLow
+            containerColor = containerColor
         ),
         modifier = Modifier.fillMaxWidth()
     ) {
