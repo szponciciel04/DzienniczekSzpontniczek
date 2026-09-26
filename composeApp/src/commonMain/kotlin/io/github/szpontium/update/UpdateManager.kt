@@ -1,10 +1,10 @@
 package io.github.szpontium.update
 
 import io.ktor.client.HttpClient
-import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.statement.bodyAsChannel
+import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpHeaders
 import io.ktor.http.isSuccess
 import io.ktor.utils.io.ByteReadChannel
@@ -14,8 +14,10 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
 
 private const val GITHUB_RELEASES_URL = "https://api.github.com/repos/szponciciel04/DzienniczekSzpontniczek/releases/latest"
+private val json = Json { ignoreUnknownKeys = true }
 
 @Serializable
 data class GithubAsset(
@@ -85,7 +87,8 @@ class UpdateManager(
                 return
             }
 
-            val release = response.body<GithubRelease>()
+            val bodyText = response.bodyAsText()
+            val release = json.decodeFromString<GithubRelease>(bodyText)
             val latestVersion = release.tagName.removePrefix("v").trim()
 
             if (isNewerVersion(currentVersion, latestVersion)) {
