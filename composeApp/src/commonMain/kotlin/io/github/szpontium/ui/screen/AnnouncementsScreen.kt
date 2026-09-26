@@ -9,8 +9,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Card
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -35,9 +36,10 @@ fun AnnouncementsScreen(viewModel: AnnouncementsViewModel = koinViewModel()) {
         }
         state.error != null -> ErrorScreen(state.error!!, onRetry = { viewModel.load() })
         state.announcements.isEmpty() -> EmptyScreen("Brak ogłoszeń")
-        else -> LazyColumn(modifier = Modifier.fillMaxSize()) {
-            items(state.announcements) { announcement ->
+        else -> LazyColumn(modifier = Modifier.fillMaxSize().padding(top = 8.dp)) {
+            items(state.announcements, key = { it.id }) { announcement ->
                 AnnouncementCard(announcement)
+                Spacer(Modifier.height(8.dp))
             }
             item { Spacer(Modifier.height(16.dp)) }
         }
@@ -46,16 +48,17 @@ fun AnnouncementsScreen(viewModel: AnnouncementsViewModel = koinViewModel()) {
 
 @Composable
 private fun AnnouncementCard(announcement: Announcement) {
-    Card(
+    ElevatedCard(
+        shape = RoundedCornerShape(20.dp),
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 12.dp, vertical = 5.dp)
+            .padding(horizontal = 16.dp, vertical = 2.dp)
     ) {
-        Column(modifier = Modifier.padding(14.dp)) {
+        Column(modifier = Modifier.padding(16.dp)) {
             Text(
                 text = announcement.title,
-                style = MaterialTheme.typography.titleSmall,
-                fontWeight = FontWeight.SemiBold
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold
             )
             Spacer(Modifier.height(4.dp))
             Text(
@@ -64,9 +67,9 @@ private fun AnnouncementCard(announcement: Announcement) {
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             if (announcement.content.isNotBlank()) {
-                Spacer(Modifier.height(6.dp))
+                Spacer(Modifier.height(8.dp))
                 HorizontalDivider()
-                Spacer(Modifier.height(6.dp))
+                Spacer(Modifier.height(8.dp))
                 Text(
                     text = announcement.content,
                     style = MaterialTheme.typography.bodyMedium

@@ -1,12 +1,23 @@
 package io.github.szpontium.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Shapes
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+
+val ExpressiveShapes = Shapes(
+    extraSmall = RoundedCornerShape(8.dp),
+    small = RoundedCornerShape(12.dp),
+    medium = RoundedCornerShape(20.dp),
+    large = RoundedCornerShape(28.dp),
+    extraLarge = RoundedCornerShape(36.dp)
+)
 
 val lightScheme = lightColorScheme(
     primary = primaryLight,
@@ -171,12 +182,12 @@ private val mediumContrastDarkColorScheme = darkColorScheme(
     onSecondaryContainer = onSecondaryContainerDarkMediumContrast,
     tertiary = tertiaryDarkMediumContrast,
     onTertiary = onTertiaryDarkMediumContrast,
-    tertiaryContainer = tertiaryContainerDarkMediumContrast,
-    onTertiaryContainer = onTertiaryContainerDarkMediumContrast,
+    tertiaryContainer = tertiaryDarkMediumContrast,
+    onTertiaryContainer = onTertiaryDarkMediumContrast,
     error = errorDarkMediumContrast,
     onError = onErrorDarkMediumContrast,
-    errorContainer = errorContainerDarkMediumContrast,
-    onErrorContainer = onErrorContainerDarkMediumContrast,
+    errorContainer = errorDarkMediumContrast,
+    onErrorContainer = onErrorDarkMediumContrast,
     background = backgroundDarkMediumContrast,
     onBackground = onBackgroundDarkMediumContrast,
     surface = surfaceDarkMediumContrast,
@@ -201,20 +212,20 @@ private val mediumContrastDarkColorScheme = darkColorScheme(
 private val highContrastDarkColorScheme = darkColorScheme(
     primary = primaryDarkHighContrast,
     onPrimary = onPrimaryDarkHighContrast,
-    primaryContainer = primaryContainerDarkHighContrast,
-    onPrimaryContainer = onPrimaryContainerDarkHighContrast,
+    primaryContainer = primaryDarkHighContrast,
+    onPrimaryContainer = onPrimaryDarkHighContrast,
     secondary = secondaryDarkHighContrast,
     onSecondary = onSecondaryDarkHighContrast,
-    secondaryContainer = secondaryContainerDarkHighContrast,
-    onSecondaryContainer = onSecondaryContainerDarkHighContrast,
+    secondaryContainer = secondaryDarkHighContrast,
+    onSecondaryContainer = onSecondaryDarkHighContrast,
     tertiary = tertiaryDarkHighContrast,
     onTertiary = onTertiaryDarkHighContrast,
-    tertiaryContainer = tertiaryContainerDarkHighContrast,
-    onTertiaryContainer = onTertiaryContainerDarkHighContrast,
+    tertiaryContainer = tertiaryDarkHighContrast,
+    onTertiaryContainer = onTertiaryDarkHighContrast,
     error = errorDarkHighContrast,
     onError = onErrorDarkHighContrast,
-    errorContainer = errorContainerDarkHighContrast,
-    onErrorContainer = onErrorContainerDarkHighContrast,
+    errorContainer = errorDarkHighContrast,
+    onErrorContainer = onErrorDarkHighContrast,
     background = backgroundDarkHighContrast,
     onBackground = onBackgroundDarkHighContrast,
     surface = surfaceDarkHighContrast,
@@ -255,4 +266,3 @@ expect fun SzpontTheme(
     dynamicColor: Boolean = true,
     content: @Composable() () -> Unit
 )
-

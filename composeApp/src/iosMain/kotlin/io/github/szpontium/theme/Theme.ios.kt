@@ -11,6 +11,7 @@ actual fun SzpontTheme(
 ) {
     MaterialTheme(
         colorScheme = if (darkTheme) darkScheme else lightScheme,
+        shapes = ExpressiveShapes,
         content = content
     )
 }

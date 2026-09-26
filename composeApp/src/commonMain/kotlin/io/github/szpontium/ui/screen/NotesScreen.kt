@@ -1,5 +1,6 @@
 package io.github.szpontium.ui.screen
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,11 +12,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.material3.Card
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -44,9 +46,10 @@ fun NotesScreen(viewModel: NotesViewModel = koinViewModel()) {
         }
         state.error != null -> ErrorScreen(state.error!!, onRetry = { viewModel.load() })
         state.notes.isEmpty() -> EmptyScreen("Brak uwag")
-        else -> LazyColumn(modifier = Modifier.fillMaxSize()) {
-            items(state.notes) { note ->
+        else -> LazyColumn(modifier = Modifier.fillMaxSize().padding(top = 8.dp)) {
+            items(state.notes, key = { it.id }) { note ->
                 NoteCard(note)
+                Spacer(Modifier.height(8.dp))
             }
             item { Spacer(Modifier.height(16.dp)) }
         }
@@ -69,15 +72,16 @@ private fun NoteCard(note: Note) {
         negativeOnContainerColor
     }
 
-    Card(
-        colors = CardDefaults.cardColors(
+    ElevatedCard(
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.elevatedCardColors(
             containerColor = containerColor
         ),
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 12.dp, vertical = 5.dp)
+            .padding(horizontal = 16.dp, vertical = 2.dp)
     ) {
-        Column(modifier = Modifier.padding(14.dp)) {
+        Column(modifier = Modifier.padding(16.dp)) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
@@ -86,15 +90,15 @@ private fun NoteCard(note: Note) {
                     text = if (note.positive) "👍" else "⚠",
                     modifier = Modifier
                         .padding(end = 8.dp)
-                        .size(20.dp)
+                        .size(22.dp)
                 )
                 Column(modifier = Modifier.weight(1f)) {
                     val category = note.category
                     if (category != null) {
                         Text(
                             text = category.name,
-                            style = MaterialTheme.typography.labelMedium,
-                            fontWeight = FontWeight.SemiBold,
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
                             color = onContainerColor
                         )
                     }
@@ -105,21 +109,27 @@ private fun NoteCard(note: Note) {
                     )
                 }
                 note.points?.let {
-                    Text(
-                        text = "${if (it > 0) "+" else ""}$it pkt",
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = onContainerColor
-                    )
+                    Surface(
+                        color = onContainerColor.copy(alpha = 0.15f),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Text(
+                            text = "${if (it > 0) "+" else ""}$it pkt",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = onContainerColor,
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                        )
+                    }
                 }
             }
-            Spacer(Modifier.height(6.dp))
+            Spacer(Modifier.height(8.dp))
             Text(
                 text = note.content,
                 style = MaterialTheme.typography.bodyMedium,
                 color = onContainerColor
             )
-            Spacer(Modifier.height(4.dp))
+            Spacer(Modifier.height(6.dp))
             Text(
                 text = "Nauczyciel: ${note.creator.displayName}",
                 style = MaterialTheme.typography.bodySmall,

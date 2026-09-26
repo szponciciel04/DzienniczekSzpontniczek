@@ -11,18 +11,22 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -33,6 +37,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -43,6 +48,7 @@ import io.github.szpontium.viewmodel.LoginEvent
 import io.github.szpontium.viewmodel.LoginViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(
     onLoginSuccess: () -> Unit,
@@ -78,35 +84,40 @@ fun LoginScreen(
             Spacer(Modifier.height(48.dp))
             Text(
                 text = "Szpontium",
-                style = MaterialTheme.typography.headlineLarge
+                style = MaterialTheme.typography.displaySmall,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary
             )
             Text(
-                text = "E-dziennik",
+                text = "E-dziennik nowej generacji",
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Spacer(Modifier.height(32.dp))
 
             var selectedTab by remember { mutableIntStateOf(0) }
-            TabRow(selectedTabIndex = selectedTab) {
-                Tab(
-                    selected = selectedTab == 0,
-                    onClick = { selectedTab = 0 },
-                    text = { Text("EduVULCAN") }
-                )
-                Tab(
-                    selected = selectedTab == 1,
-                    onClick = { selectedTab = 1 },
-                    text = { Text("Dzienniczek") }
-                )
-                Tab(
-                    selected = selectedTab == 2,
-                    onClick = { selectedTab = 2 },
-                    text = { Text("Librus") }
-                )
+            val tabTitles = listOf("EduVULCAN", "Dzienniczek", "Librus")
+
+            SingleChoiceSegmentedButtonRow(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                tabTitles.forEachIndexed { index, title ->
+                    SegmentedButton(
+                        selected = selectedTab == index,
+                        onClick = { selectedTab = index },
+                        shape = SegmentedButtonDefaults.itemShape(index = index, count = tabTitles.size),
+                        label = {
+                            Text(
+                                text = title,
+                                style = MaterialTheme.typography.labelLarge,
+                                fontWeight = if (selectedTab == index) FontWeight.Bold else FontWeight.Normal
+                            )
+                        }
+                    )
+                }
             }
 
-            Spacer(Modifier.height(24.dp))
+            Spacer(Modifier.height(28.dp))
 
             when (selectedTab) {
                 0 -> EduVulcanLoginTab(
@@ -145,6 +156,7 @@ private fun EduVulcanLoginTab(
             onValueChange = { login = it },
             label = { Text("Login (e-mail)") },
             singleLine = true,
+            shape = RoundedCornerShape(16.dp),
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Email,
                 imeAction = ImeAction.Next
@@ -157,6 +169,7 @@ private fun EduVulcanLoginTab(
             onValueChange = { password = it },
             label = { Text("Hasło") },
             singleLine = true,
+            shape = RoundedCornerShape(16.dp),
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Password,
@@ -168,14 +181,20 @@ private fun EduVulcanLoginTab(
         Button(
             onClick = { onLogin(login, password) },
             enabled = !isLoading && login.isNotBlank() && password.isNotBlank(),
-            modifier = Modifier.fillMaxWidth()
+            shape = RoundedCornerShape(28.dp),
+            modifier = Modifier.fillMaxWidth().height(52.dp)
         ) {
             if (isLoading) {
                 CircularProgressIndicator(
-                    modifier = Modifier.size(24.dp)
+                    modifier = Modifier.size(24.dp),
+                    color = MaterialTheme.colorScheme.onPrimary
                 )
             } else {
-                Text("Zaloguj się")
+                Text(
+                    text = "Zaloguj się",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
             }
         }
     }
@@ -196,6 +215,7 @@ private fun DzienniczekLoginTab(
             onValueChange = { symbol = it },
             label = { Text("Symbol szkoły") },
             singleLine = true,
+            shape = RoundedCornerShape(16.dp),
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
             modifier = Modifier.fillMaxWidth()
         )
@@ -205,6 +225,7 @@ private fun DzienniczekLoginTab(
             onValueChange = { token = it },
             label = { Text("Token") },
             singleLine = true,
+            shape = RoundedCornerShape(16.dp),
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
             modifier = Modifier.fillMaxWidth()
         )
@@ -214,6 +235,7 @@ private fun DzienniczekLoginTab(
             onValueChange = { pin = it },
             label = { Text("PIN") },
             singleLine = true,
+            shape = RoundedCornerShape(16.dp),
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.NumberPassword,
@@ -231,15 +253,20 @@ private fun DzienniczekLoginTab(
         Button(
             onClick = { onLogin(token, pin, symbol) },
             enabled = !isLoading && token.isNotBlank() && pin.isNotBlank() && symbol.isNotBlank(),
-            modifier = Modifier.fillMaxWidth()
+            shape = RoundedCornerShape(28.dp),
+            modifier = Modifier.fillMaxWidth().height(52.dp)
         ) {
             if (isLoading) {
                 CircularProgressIndicator(
-                    modifier = Modifier.height(20.dp),
-                    strokeWidth = 2.dp
+                    modifier = Modifier.size(24.dp),
+                    color = MaterialTheme.colorScheme.onPrimary
                 )
             } else {
-                Text("Zarejestruj urządzenie")
+                Text(
+                    text = "Zarejestruj urządzenie",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
             }
         }
     }
@@ -259,12 +286,13 @@ private fun LibrusLoginTab(
                 containerColor = MaterialTheme.colorScheme.tertiaryContainer,
                 contentColor = MaterialTheme.colorScheme.onTertiaryContainer
             ),
+            shape = RoundedCornerShape(20.dp),
             modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)
         ) {
             Text(
                 text = "Zaloguj się danymi do Konta LIBRUS (portal.librus.pl). Jeśli posiadasz login Synergia (np. 1234567u), powiąż go najpierw na stronie portalu.",
                 style = MaterialTheme.typography.bodySmall,
-                modifier = Modifier.padding(12.dp)
+                modifier = Modifier.padding(16.dp)
             )
         }
 
@@ -273,6 +301,7 @@ private fun LibrusLoginTab(
             onValueChange = { email = it },
             label = { Text("E-mail (Konto LIBRUS)") },
             singleLine = true,
+            shape = RoundedCornerShape(16.dp),
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Email,
                 imeAction = ImeAction.Next
@@ -285,6 +314,7 @@ private fun LibrusLoginTab(
             onValueChange = { password = it },
             label = { Text("Hasło") },
             singleLine = true,
+            shape = RoundedCornerShape(16.dp),
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Password,
@@ -296,15 +326,20 @@ private fun LibrusLoginTab(
         Button(
             onClick = { onLogin(email, password) },
             enabled = !isLoading && email.isNotBlank() && password.isNotBlank(),
-            modifier = Modifier.fillMaxWidth()
+            shape = RoundedCornerShape(28.dp),
+            modifier = Modifier.fillMaxWidth().height(52.dp)
         ) {
             if (isLoading) {
                 CircularProgressIndicator(
-                    modifier = Modifier.size(20.dp),
-                    strokeWidth = 2.dp
+                    modifier = Modifier.size(24.dp),
+                    color = MaterialTheme.colorScheme.onPrimary
                 )
             } else {
-                Text("Zaloguj przez Librus")
+                Text(
+                    text = "Zaloguj przez Librus",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
             }
         }
     }
