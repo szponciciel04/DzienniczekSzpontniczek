@@ -1,7 +1,6 @@
 package io.github.szpontium.ui.screen
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -34,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.szpontium.api.hebe.models.LuckyNumber
 import io.github.szpontium.navigation.Route
+import io.github.szpontium.theme.expressiveGroupShape
 import io.github.szpontium.viewmodel.StartViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -184,8 +184,16 @@ fun StartScreen(
                         )
                     }
                     if (state.upcomingExams.isNotEmpty()) {
-                        state.upcomingExams.forEach { exam ->
-                            BoxPadding { ExamCard(exam) }
+                        Column {
+                            state.upcomingExams.forEachIndexed { index, exam ->
+                                ExamCard(
+                                    exam = exam,
+                                    shape = expressiveGroupShape(index = index, count = state.upcomingExams.size)
+                                )
+                                if (index < state.upcomingExams.size - 1) {
+                                    Spacer(Modifier.height(3.dp))
+                                }
+                            }
                         }
                     } else {
                         EmptinessText("Brak sprawdzianów zapowiedzianych na nadchodzący tydzień.")
@@ -214,8 +222,16 @@ fun StartScreen(
                         )
                     }
                     if (state.upcomingHomework.isNotEmpty()) {
-                        state.upcomingHomework.forEach { hw ->
-                            BoxPadding { HomeworkCard(hw) }
+                        Column {
+                            state.upcomingHomework.forEachIndexed { index, hw ->
+                                HomeworkCard(
+                                    hw = hw,
+                                    shape = expressiveGroupShape(index = index, count = state.upcomingHomework.size)
+                                )
+                                if (index < state.upcomingHomework.size - 1) {
+                                    Spacer(Modifier.height(3.dp))
+                                }
+                            }
                         }
                     } else {
                         EmptinessText("Brak zadań domowych z terminem na najbliższe 7 dni.")
@@ -223,13 +239,6 @@ fun StartScreen(
                 }
             }
         }
-    }
-}
-
-@Composable
-private fun BoxPadding(content: @Composable () -> Unit) {
-    Box(modifier = Modifier.padding(bottom = 8.dp)) {
-        content()
     }
 }
 
