@@ -11,7 +11,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
@@ -28,9 +28,11 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.szpontium.navigation.CandidateStudent
+import io.github.szpontium.theme.expressiveGroupShape
 import io.github.szpontium.viewmodel.SelectStudentsViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -103,12 +105,15 @@ fun SelectStudentsScreen(
             LazyColumn(
                 modifier = Modifier.weight(1f)
             ) {
-                items(candidateList, key = { it.id }) { cand ->
+                itemsIndexed(candidateList, key = { _, c -> c.id }) { index, cand ->
                     CandidateStudentCard(
                         candidate = cand,
+                        shape = expressiveGroupShape(index = index, count = candidateList.size),
                         onToggle = { viewModel.toggleCandidate(cand.id) }
                     )
-                    Spacer(Modifier.height(12.dp))
+                    if (index < candidateList.size - 1) {
+                        Spacer(Modifier.height(3.dp))
+                    }
                 }
             }
         }
@@ -118,9 +123,11 @@ fun SelectStudentsScreen(
 @Composable
 private fun CandidateStudentCard(
     candidate: CandidateStudent,
+    shape: Shape,
     onToggle: () -> Unit
 ) {
     ElevatedCard(
+        shape = shape,
         modifier = Modifier
             .fillMaxWidth()
             .clickable { onToggle() }

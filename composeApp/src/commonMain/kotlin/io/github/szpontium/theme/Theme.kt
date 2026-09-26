@@ -1,6 +1,7 @@
 package io.github.szpontium.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.shape.CornerBasedShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Shapes
@@ -9,6 +10,7 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 val ExpressiveShapes = Shapes(
@@ -18,6 +20,30 @@ val ExpressiveShapes = Shapes(
     large = RoundedCornerShape(28.dp),
     extraLarge = RoundedCornerShape(36.dp)
 )
+
+fun expressiveGroupShape(
+    index: Int,
+    count: Int,
+    outerCornerRadius: Dp = 20.dp,
+    innerCornerRadius: Dp = 4.dp
+): CornerBasedShape {
+    if (count <= 1) return RoundedCornerShape(outerCornerRadius)
+    return when (index) {
+        0 -> RoundedCornerShape(
+            topStart = outerCornerRadius,
+            topEnd = outerCornerRadius,
+            bottomStart = innerCornerRadius,
+            bottomEnd = innerCornerRadius
+        )
+        count - 1 -> RoundedCornerShape(
+            topStart = innerCornerRadius,
+            topEnd = innerCornerRadius,
+            bottomStart = outerCornerRadius,
+            bottomEnd = outerCornerRadius
+        )
+        else -> RoundedCornerShape(innerCornerRadius)
+    }
+}
 
 val lightScheme = lightColorScheme(
     primary = primaryLight,
@@ -110,7 +136,7 @@ private val mediumContrastLightColorScheme = lightColorScheme(
     onTertiaryContainer = onTertiaryContainerLightMediumContrast,
     error = errorLightMediumContrast,
     onError = onErrorLightMediumContrast,
-    errorContainer = errorContainerLightMediumContrast,
+    errorContainer = errorLightMediumContrast,
     onErrorContainer = onErrorContainerLightMediumContrast,
     background = backgroundLightMediumContrast,
     onBackground = onBackgroundLightMediumContrast,
@@ -148,8 +174,8 @@ private val highContrastLightColorScheme = lightColorScheme(
     onTertiaryContainer = onTertiaryContainerLightHighContrast,
     error = errorLightHighContrast,
     onError = onErrorLightHighContrast,
-    errorContainer = errorContainerLightHighContrast,
-    onErrorContainer = onErrorContainerLightHighContrast,
+    errorContainer = errorLightHighContrast,
+    onErrorContainer = onErrorLightHighContrast,
     background = backgroundLightHighContrast,
     onBackground = onBackgroundLightHighContrast,
     surface = surfaceLightHighContrast,
@@ -174,12 +200,12 @@ private val highContrastLightColorScheme = lightColorScheme(
 private val mediumContrastDarkColorScheme = darkColorScheme(
     primary = primaryDarkMediumContrast,
     onPrimary = onPrimaryDarkMediumContrast,
-    primaryContainer = primaryContainerDarkMediumContrast,
-    onPrimaryContainer = onPrimaryContainerDarkMediumContrast,
+    primaryContainer = primaryDarkMediumContrast,
+    onPrimaryContainer = onPrimaryDarkMediumContrast,
     secondary = secondaryDarkMediumContrast,
     onSecondary = onSecondaryDarkMediumContrast,
-    secondaryContainer = secondaryContainerDarkMediumContrast,
-    onSecondaryContainer = onSecondaryContainerDarkMediumContrast,
+    secondaryContainer = secondaryDarkMediumContrast,
+    onSecondaryContainer = onSecondaryDarkMediumContrast,
     tertiary = tertiaryDarkMediumContrast,
     onTertiary = onTertiaryDarkMediumContrast,
     tertiaryContainer = tertiaryDarkMediumContrast,

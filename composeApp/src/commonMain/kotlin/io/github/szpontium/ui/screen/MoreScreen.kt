@@ -10,7 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Announcement
 import androidx.compose.material.icons.filled.Add
@@ -32,56 +32,52 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.szpontium.navigation.Route
 import io.github.szpontium.session.StudentSession
+import io.github.szpontium.theme.expressiveGroupShape
 import io.github.szpontium.viewmodel.AccountViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun MoreScreen(onNavigate: (Route) -> Unit) {
+    val items = listOf(
+        Triple(Icons.Outlined.EmojiEvents, "Uwagi i osiągnięcia", Route.Notes),
+        Triple(Icons.AutoMirrored.Outlined.Announcement, "Ogłoszenia", Route.Announcements),
+        Triple(Icons.Outlined.Person, "Wiadomości", Route.Messages),
+        Triple(Icons.Outlined.Book, "Zadania domowe", Route.Homework),
+        Triple(Icons.Outlined.Person, "Konto i uczniowie", Route.Account)
+    )
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        MoreItem(
-            icon = Icons.Outlined.EmojiEvents,
-            title = "Uwagi i osiągnięcia",
-            onClick = { onNavigate(Route.Notes) }
-        )
-        Spacer(Modifier.height(12.dp))
-        MoreItem(
-            icon = Icons.AutoMirrored.Outlined.Announcement,
-            title = "Ogłoszenia",
-            onClick = { onNavigate(Route.Announcements) }
-        )
-        Spacer(Modifier.height(12.dp))
-        MoreItem(
-            icon = Icons.Outlined.Person,
-            title = "Wiadomości",
-            onClick = { onNavigate(Route.Messages) }
-        )
-        Spacer(Modifier.height(12.dp))
-        MoreItem(
-            icon = Icons.Outlined.Book,
-            title = "Zadania domowe",
-            onClick = { onNavigate(Route.Homework) }
-        )
-        Spacer(Modifier.height(12.dp))
-        MoreItem(
-            icon = Icons.Outlined.Person,
-            title = "Konto i uczniowie",
-            onClick = { onNavigate(Route.Account) }
-        )
+        items.forEachIndexed { index, (icon, title, route) ->
+            MoreItem(
+                icon = icon,
+                title = title,
+                shape = expressiveGroupShape(index = index, count = items.size),
+                onClick = { onNavigate(route) }
+            )
+            if (index < items.size - 1) {
+                Spacer(Modifier.height(3.dp))
+            }
+        }
     }
 }
 
 @Composable
-private fun MoreItem(icon: ImageVector, title: String, onClick: () -> Unit) {
-    ElevatedCard(onClick = onClick, modifier = Modifier.fillMaxWidth()) {
+private fun MoreItem(icon: ImageVector, title: String, shape: Shape, onClick: () -> Unit) {
+    ElevatedCard(
+        onClick = onClick,
+        shape = shape,
+        modifier = Modifier.fillMaxWidth()
+    ) {
         Row(
             modifier = Modifier.padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
@@ -129,10 +125,11 @@ fun AccountScreen(
         LazyColumn(
             modifier = Modifier.weight(1f)
         ) {
-            items(studentSessions, key = { it.id }) { student ->
+            itemsIndexed(studentSessions, key = { _, s -> s.id }) { index, student ->
                 StudentAccountCard(
                     student = student,
                     isActive = student.id == activeStudent?.id,
+                    shape = expressiveGroupShape(index = index, count = studentSessions.size),
                     onToggleEnabled = { enabled ->
                         viewModel.toggleStudentEnabled(student.id, enabled)
                     },
@@ -140,7 +137,9 @@ fun AccountScreen(
                         viewModel.removeStudent(student.id, onLogout)
                     }
                 )
-                Spacer(Modifier.height(12.dp))
+                if (index < studentSessions.size - 1) {
+                    Spacer(Modifier.height(3.dp))
+                }
             }
         }
 
@@ -175,10 +174,14 @@ fun AccountScreen(
 private fun StudentAccountCard(
     student: StudentSession,
     isActive: Boolean,
+    shape: Shape,
     onToggleEnabled: (Boolean) -> Unit,
     onRemove: () -> Unit
 ) {
-    ElevatedCard(modifier = Modifier.fillMaxWidth()) {
+    ElevatedCard(
+        shape = shape,
+        modifier = Modifier.fillMaxWidth()
+    ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(
                 modifier = Modifier.fillMaxWidth(),

@@ -10,8 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Attachment
 import androidx.compose.material.icons.filled.MarkEmailUnread
@@ -30,11 +29,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.szpontium.navigation.Route
+import io.github.szpontium.theme.expressiveGroupShape
 import io.github.szpontium.ui.model.UiMessage
 import io.github.szpontium.viewmodel.MessageTab
 import io.github.szpontium.viewmodel.MessagesViewModel
@@ -91,12 +92,18 @@ fun MessagesScreen(onNavigate: (Route) -> Unit, viewModel: MessagesViewModel = k
                     EmptyScreen("Brak wiadomości w tym folderze")
                 }
                 else -> {
-                    LazyColumn(modifier = Modifier.fillMaxSize()) {
-                        items(state.messages, key = { it.id }) { message ->
-                            MessageCard(message, onClick = {
-                                onNavigate(Route.MessageDetails(id = message.id, isHebe = message.content != null, hebeContent = message.content))
-                            })
-                            Spacer(Modifier.height(8.dp))
+                    LazyColumn(modifier = Modifier.fillMaxSize().padding(top = 8.dp)) {
+                        itemsIndexed(state.messages, key = { _, m -> m.id }) { index, message ->
+                            MessageCard(
+                                message = message,
+                                shape = expressiveGroupShape(index = index, count = state.messages.size),
+                                onClick = {
+                                    onNavigate(Route.MessageDetails(id = message.id, isHebe = message.content != null, hebeContent = message.content))
+                                }
+                            )
+                            if (index < state.messages.size - 1) {
+                                Spacer(Modifier.height(3.dp))
+                            }
                         }
                         item { Spacer(Modifier.height(16.dp)) }
                     }
@@ -107,10 +114,14 @@ fun MessagesScreen(onNavigate: (Route) -> Unit, viewModel: MessagesViewModel = k
 }
 
 @Composable
-private fun MessageCard(message: UiMessage, onClick: () -> Unit) {
+private fun MessageCard(
+    message: UiMessage,
+    shape: Shape,
+    onClick: () -> Unit
+) {
     ElevatedCard(
         onClick = onClick,
-        shape = RoundedCornerShape(20.dp),
+        shape = shape,
         colors = CardDefaults.elevatedCardColors(
             containerColor = if (message.isUnread)
                 MaterialTheme.colorScheme.surfaceContainerHigh
@@ -119,7 +130,7 @@ private fun MessageCard(message: UiMessage, onClick: () -> Unit) {
         ),
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 2.dp)
+            .padding(horizontal = 16.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(verticalAlignment = Alignment.Top) {

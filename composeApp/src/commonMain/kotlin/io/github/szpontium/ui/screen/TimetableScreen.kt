@@ -1,5 +1,6 @@
 package io.github.szpontium.ui.screen
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,15 +11,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -29,14 +27,16 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.szpontium.api.hebe.models.Schedule
+import io.github.szpontium.theme.expressiveGroupShape
 import io.github.szpontium.viewmodel.TimetableViewModel
+import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.plus
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -98,9 +98,15 @@ fun TimetableScreen(viewModel: TimetableViewModel = koinViewModel()) {
                         if (lessons.isNotEmpty()) {
                             item {
                                 DayHeader(date)
-                                Column {
-                                    lessons.forEach { lesson ->
-                                        LessonCard(lesson)
+                                Column(modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)) {
+                                    lessons.forEachIndexed { index, lesson ->
+                                        LessonCard(
+                                            lesson = lesson,
+                                            shape = expressiveGroupShape(index = index, count = lessons.size)
+                                        )
+                                        if (index < lessons.size - 1) {
+                                            Spacer(Modifier.height(3.dp))
+                                        }
                                     }
                                 }
                                 Spacer(Modifier.height(8.dp))
@@ -117,19 +123,21 @@ fun TimetableScreen(viewModel: TimetableViewModel = koinViewModel()) {
 @Composable
 private fun DayHeader(date: LocalDate) {
     Surface(
-        color = MaterialTheme.colorScheme.primaryContainer,
+        color = MaterialTheme.colorScheme.surfaceContainerHigh,
         modifier = Modifier.fillMaxWidth()
     ) {
         Text(
             text = "${POLISH_DAYS[date.dayOfWeek] ?: date.dayOfWeek.name}, ${date.day}.${date.monthNumber}",
-            style = MaterialTheme.typography.labelLarge,
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp)
+            style = MaterialTheme.typography.titleSmall,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
         )
     }
 }
 
 @Composable
-private fun LessonCard(lesson: Schedule) {
+private fun LessonCard(lesson: Schedule, shape: Shape) {
     val isSubstitution = lesson.substitution != null
     val isCancelled = lesson.substitution?.change?.type == 2
     val darkTheme = isSystemInDarkTheme()
@@ -147,7 +155,7 @@ private fun LessonCard(lesson: Schedule) {
     val containerColor = when {
         isCancelled -> MaterialTheme.colorScheme.errorContainer
         isSubstitution -> substitutionContainerColor
-        else -> MaterialTheme.colorScheme.surface
+        else -> MaterialTheme.colorScheme.surfaceContainerLow
     }
 
     val onContainerColor = when {
@@ -157,13 +165,12 @@ private fun LessonCard(lesson: Schedule) {
     }
 
     Card(
+        shape = shape,
         colors = CardDefaults.cardColors(containerColor = containerColor),
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 12.dp, vertical = 3.dp)
+        modifier = Modifier.fillMaxWidth()
     ) {
         Row(
-            modifier = Modifier.padding(12.dp),
+            modifier = Modifier.padding(14.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(

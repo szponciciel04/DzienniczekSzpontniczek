@@ -11,7 +11,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -24,10 +24,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.szpontium.api.hebe.models.Note
+import io.github.szpontium.theme.expressiveGroupShape
 import io.github.szpontium.viewmodel.NotesViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -47,9 +49,14 @@ fun NotesScreen(viewModel: NotesViewModel = koinViewModel()) {
         state.error != null -> ErrorScreen(state.error!!, onRetry = { viewModel.load() })
         state.notes.isEmpty() -> EmptyScreen("Brak uwag")
         else -> LazyColumn(modifier = Modifier.fillMaxSize().padding(top = 8.dp)) {
-            items(state.notes, key = { it.id }) { note ->
-                NoteCard(note)
-                Spacer(Modifier.height(8.dp))
+            itemsIndexed(state.notes, key = { _, note -> note.id }) { index, note ->
+                NoteCard(
+                    note = note,
+                    shape = expressiveGroupShape(index = index, count = state.notes.size)
+                )
+                if (index < state.notes.size - 1) {
+                    Spacer(Modifier.height(3.dp))
+                }
             }
             item { Spacer(Modifier.height(16.dp)) }
         }
@@ -57,7 +64,7 @@ fun NotesScreen(viewModel: NotesViewModel = koinViewModel()) {
 }
 
 @Composable
-private fun NoteCard(note: Note) {
+private fun NoteCard(note: Note, shape: Shape) {
     val darkTheme = isSystemInDarkTheme()
     val negativeContainerColor = if (!darkTheme) noteNeutralContainerLight else noteNeutralContainerDark
     val negativeOnContainerColor = if (!darkTheme) noteNeutralOnContainerLight else noteNeutralOnContainerDark
@@ -73,13 +80,13 @@ private fun NoteCard(note: Note) {
     }
 
     ElevatedCard(
-        shape = RoundedCornerShape(20.dp),
+        shape = shape,
         colors = CardDefaults.elevatedCardColors(
             containerColor = containerColor
         ),
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 2.dp)
+            .padding(horizontal = 16.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(

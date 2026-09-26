@@ -3,6 +3,8 @@ package io.github.szpontium.ui.screen
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,24 +12,24 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.ElevatedCard
-import androidx.compose.material3.CardDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.szpontium.api.hebe.models.Grade
+import io.github.szpontium.theme.expressiveGroupShape
 import io.github.szpontium.viewmodel.GradesViewModel
 import org.koin.compose.viewmodel.koinViewModel
 import kotlin.math.round
@@ -46,17 +48,19 @@ fun GradesScreen(viewModel: GradesViewModel = koinViewModel()) {
         )
         state.grades.isEmpty() -> EmptyScreen("Brak ocen w bieżącym okresie")
         else -> {
-            val bySubject = state.grades.groupBy { it.column.subject.name }
+            val bySubjectList = state.grades.groupBy { it.column.subject.name }.toList()
             val averageMap = state.averages.associate { it.subject.name to it.average }
 
-            LazyColumn(modifier = Modifier.fillMaxSize()) {
-                bySubject.forEach { (subject, grades) ->
-                    item {
-                        SubjectGradesSection(
-                            subject = subject,
-                            grades = grades,
-                            average = averageMap[subject]
-                        )
+            LazyColumn(modifier = Modifier.fillMaxSize().padding(vertical = 8.dp)) {
+                itemsIndexed(bySubjectList, key = { _, pair -> pair.first }) { index, (subject, grades) ->
+                    SubjectGradesSection(
+                        subject = subject,
+                        grades = grades,
+                        average = averageMap[subject],
+                        shape = expressiveGroupShape(index = index, count = bySubjectList.size)
+                    )
+                    if (index < bySubjectList.size - 1) {
+                        Spacer(Modifier.height(3.dp))
                     }
                 }
                 item { Spacer(Modifier.height(16.dp)) }
@@ -70,7 +74,8 @@ fun GradesScreen(viewModel: GradesViewModel = koinViewModel()) {
 private fun SubjectGradesSection(
     subject: String,
     grades: List<Grade>,
-    average: String?
+    average: String?,
+    shape: Shape
 ) {
     val eligibleGrades = grades.filter {
         val w = it.column.weight
@@ -86,8 +91,8 @@ private fun SubjectGradesSection(
     ElevatedCard(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
-        shape = RoundedCornerShape(20.dp),
+            .padding(horizontal = 16.dp),
+        shape = shape,
         elevation = CardDefaults.elevatedCardElevation(defaultElevation = 2.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
