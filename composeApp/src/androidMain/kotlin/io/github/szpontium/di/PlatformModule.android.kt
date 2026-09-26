@@ -6,6 +6,6 @@ import org.koin.core.module.Module
 import org.koin.dsl.module
 
 actual val platformModule: Module = module {
-    single { ApkStorage(get()) }
-    single { ApkInstaller(get()) }
+    single { ApkStorage() }
+    single { ApkInstaller() }
 }

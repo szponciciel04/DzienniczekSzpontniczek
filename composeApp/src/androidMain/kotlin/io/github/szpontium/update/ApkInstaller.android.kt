@@ -6,35 +6,39 @@ import android.net.Uri
 import android.os.Build
 import android.provider.Settings
 import androidx.core.content.FileProvider
+import io.github.szpontium.platform.appContext
 import java.io.File
 
-actual class ApkInstaller(private val context: Context) {
+actual class ApkInstaller(private val context: Context? = appContext) {
 
     actual fun canRequestPackageInstalls(): Boolean {
+        val ctx = context ?: return false
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            context.packageManager.canRequestPackageInstalls()
+            ctx.packageManager.canRequestPackageInstalls()
         } else {
             true
         }
     }
 
     actual fun openInstallPermissionSettings() {
+        val ctx = context ?: return
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val intent = Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES).apply {
-                data = Uri.parse("package:${context.packageName}")
+                data = Uri.parse("package:${ctx.packageName}")
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             }
-            context.startActivity(intent)
+            ctx.startActivity(intent)
         }
     }
 
     actual fun install(apkFilePath: String) {
+        val ctx = context ?: return
         val file = File(apkFilePath)
         if (!file.exists()) return
 
         val apkUri: Uri = FileProvider.getUriForFile(
-            context,
-            "${context.packageName}.fileprovider",
+            ctx,
+            "${ctx.packageName}.fileprovider",
             file
         )
 
@@ -44,6 +48,6 @@ actual class ApkInstaller(private val context: Context) {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
 
-        context.startActivity(intent)
+        ctx.startActivity(intent)
     }
 }

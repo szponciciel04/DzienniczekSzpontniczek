@@ -1,13 +1,15 @@
 package io.github.szpontium.update
 
 import android.content.Context
+import io.github.szpontium.platform.appContext
 import java.io.File
 import java.io.FileOutputStream
 
-actual class ApkStorage(private val context: Context) {
+actual class ApkStorage(private val context: Context? = appContext) {
 
     actual fun getApkPath(): String {
-        return File(context.cacheDir, "szpontium-update.apk").absolutePath
+        val ctx = context ?: error("AppContext is null in ApkStorage")
+        return File(ctx.cacheDir, "szpontium-update.apk").absolutePath
     }
 
     actual fun appendBytes(path: String, bytes: ByteArray, length: Int, clearFirst: Boolean) {
