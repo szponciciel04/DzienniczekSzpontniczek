@@ -1,5 +1,7 @@
 package io.github.szpontium.ui.screen
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -11,7 +13,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Book
 import androidx.compose.material.icons.outlined.CalendarToday
@@ -49,7 +50,7 @@ fun StartScreen(
         Column(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = androidx.compose.foundation.layout.Arrangement.Center
+            verticalArrangement = Arrangement.Center
         ) {
             CircularProgressIndicator()
         }
@@ -129,6 +130,7 @@ fun StartScreen(
 
         item {
             ElevatedCard(
+                onClick = { onNavigate(Route.Grades) },
                 modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
@@ -148,8 +150,8 @@ fun StartScreen(
                     if (state.recentGrades.isNotEmpty()) {
                         FlowRow(
                             modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(8.dp),
-                            verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(8.dp)
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
                             state.recentGrades.forEach { grade ->
                                 GradeChip(grade)
@@ -164,6 +166,7 @@ fun StartScreen(
 
         item {
             ElevatedCard(
+                onClick = { onNavigate(Route.Exams) },
                 modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
@@ -193,6 +196,7 @@ fun StartScreen(
 
         item {
             ElevatedCard(
+                onClick = { onNavigate(Route.Homework) },
                 modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
@@ -224,7 +228,7 @@ fun StartScreen(
 
 @Composable
 private fun BoxPadding(content: @Composable () -> Unit) {
-    androidx.compose.foundation.layout.Box(modifier = Modifier.padding(bottom = 8.dp)) {
+    Box(modifier = Modifier.padding(bottom = 8.dp)) {
         content()
     }
 }
@@ -237,5 +241,3 @@ private fun EmptinessText(message: String) {
         color = MaterialTheme.colorScheme.onSurfaceVariant
     )
 }
-
-
