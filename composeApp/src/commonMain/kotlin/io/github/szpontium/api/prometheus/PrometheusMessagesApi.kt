@@ -89,11 +89,13 @@ class PrometheusMessagesApi(
             }
         }
 
-        // Load initial cookies
+        // Load initial cookies across all EduVulcan domains
         currentCookies.forEach { cookie ->
             val domain = cookie.domain?.removePrefix(".") ?: "eduvulcan.pl"
-            val url = Url("https://$domain")
-            cookieStorage.addCookie(url, cookie)
+            cookieStorage.addCookie(Url("https://$domain"), cookie)
+            cookieStorage.addCookie(Url("https://eduvulcan.pl"), cookie)
+            cookieStorage.addCookie(Url("https://dziennik-logowanie.vulcan.net.pl"), cookie)
+            cookieStorage.addCookie(Url("https://wiadomosci.eduvulcan.pl"), cookie)
         }
 
         val prometheusEncoded = UrlEncoderUtil.encode("https://eduvulcan.pl")
@@ -121,18 +123,21 @@ class PrometheusMessagesApi(
     private suspend fun authorizePrometheus(url: String) {
         val response1 = httpClient.get(url)
         val document = Ksoup.parse(response1.bodyAsText())
-        val res1 = findAndSubmitForm(document) ?: throw IllegalStateException("SSO error on $url - no form found! Page title: ${document.title()}")
+        val res1 = findAndSubmitForm(document) ?: return
         val doc2 = Ksoup.parse(res1.bodyAsText())
-        findAndSubmitForm(doc2) ?: throw IllegalStateException("SSO error (secondary form) - no form found! Page title: ${doc2.title()}")
+        if (doc2.forms().isNotEmpty()) {
+            findAndSubmitForm(doc2)
+        }
     }
 
     private suspend fun findAndSubmitForm(document: Document): HttpResponse? {
         val form = document.forms().firstOrNull() ?: return null
+        val action = form.attr("action").ifBlank { return null }
         val fields = form.children().select("input[type=\"hidden\"]")
             .associate { it.attr("name") to listOf(it.value()) }
 
         return httpClient.submitForm(
-            url = form.attr("action"),
+            url = action,
             formParameters = parametersOf(fields)
         )
     }
