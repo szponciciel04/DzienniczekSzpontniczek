@@ -8,6 +8,7 @@ import io.github.szpontium.api.hebe.models.Homework
 import io.github.szpontium.session.ApiSession
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.TimeZone
@@ -33,12 +34,21 @@ class StartViewModel(
     val state: StateFlow<StartState> = _state
 
     init {
-        loadSummary()
+        viewModelScope.launch {
+            session.activeStudent.collectLatest {
+                loadSummary()
+            }
+        }
     }
 
     private fun loadSummary() {
-        val account = session.currentAccount ?: return
-        val api = session.api ?: return
+        val account = session.currentAccount
+        val api = session.api
+        if (account == null || api == null) {
+            _state.value = StartState(isLoading = false)
+            return
+        }
+
         val period = account.periods?.firstOrNull { it.current == true } ?: account.periods?.lastOrNull() ?: return
         
         val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())

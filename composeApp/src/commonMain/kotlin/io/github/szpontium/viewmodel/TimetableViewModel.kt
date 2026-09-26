@@ -6,7 +6,7 @@ import io.github.szpontium.api.hebe.models.Schedule
 import io.github.szpontium.session.ApiSession
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlin.time.Clock
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.DayOfWeek
@@ -15,6 +15,7 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.minus
 import kotlinx.datetime.plus
 import kotlinx.datetime.toLocalDateTime
+import kotlin.time.Clock
 
 data class TimetableState(
     val isLoading: Boolean = false,
@@ -37,7 +38,11 @@ class TimetableViewModel(
     val state: StateFlow<TimetableState> = _state
 
     init {
-        loadWeek(_state.value.weekStart)
+        viewModelScope.launch {
+            session.activeStudent.collectLatest {
+                loadWeek(_state.value.weekStart)
+            }
+        }
     }
 
     fun previousWeek() {
@@ -51,8 +56,13 @@ class TimetableViewModel(
     }
 
     private fun loadWeek(weekStart: LocalDate) {
-        val account = session.currentAccount ?: return
-        val api = session.api ?: return
+        val account = session.currentAccount
+        val api = session.api
+        if (account == null || api == null) {
+            _state.value = TimetableState(isLoading = false, weekStart = weekStart)
+            return
+        }
+
         val weekEnd = weekStart.plus(6, DateTimeUnit.DAY)
 
         viewModelScope.launch {

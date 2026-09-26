@@ -31,6 +31,7 @@ import io.github.szpontium.session.SessionStorage
 import io.github.szpontium.theme.SzpontTheme
 import io.github.szpontium.ui.screen.DashboardScreen
 import io.github.szpontium.ui.screen.LoginScreen
+import io.github.szpontium.ui.screen.SelectStudentsScreen
 import kotlinx.coroutines.launch
 import org.koin.compose.KoinApplication
 import org.koin.compose.koinInject
@@ -106,6 +107,18 @@ private fun AppNavigation() {
                     onLoginSuccess = {
                         backStack.clear()
                         backStack.add(Route.Dashboard)
+                    },
+                    onSelectStudents = { candidates ->
+                        backStack.add(Route.SelectStudents(candidates))
+                    }
+                )
+            }
+            entry<Route.SelectStudents> { route ->
+                SelectStudentsScreen(
+                    candidates = route.candidates,
+                    onConfirmed = {
+                        backStack.clear()
+                        backStack.add(Route.Dashboard)
                     }
                 )
             }
@@ -117,6 +130,9 @@ private fun AppNavigation() {
                             session.clear()
                         }
                         backStack.clear()
+                        backStack.add(Route.Login)
+                    },
+                    onNavigateToAddAccount = {
                         backStack.add(Route.Login)
                     }
                 )

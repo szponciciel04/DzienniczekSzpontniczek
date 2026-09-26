@@ -38,6 +38,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import io.github.szpontium.navigation.CandidateStudent
 import io.github.szpontium.viewmodel.LoginEvent
 import io.github.szpontium.viewmodel.LoginViewModel
 import org.koin.compose.viewmodel.koinViewModel
@@ -45,6 +46,7 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun LoginScreen(
     onLoginSuccess: () -> Unit,
+    onSelectStudents: (List<CandidateStudent>) -> Unit,
     viewModel: LoginViewModel = koinViewModel()
 ) {
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
@@ -54,6 +56,7 @@ fun LoginScreen(
         viewModel.events.collect { event ->
             when (event) {
                 is LoginEvent.Success -> onLoginSuccess()
+                is LoginEvent.SelectStudents -> onSelectStudents(event.candidates)
                 is LoginEvent.Error -> snackbarHostState.showSnackbar(event.message)
             }
         }

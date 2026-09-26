@@ -6,6 +6,7 @@ import io.github.szpontium.api.hebe.models.Announcement
 import io.github.szpontium.session.ApiSession
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 data class AnnouncementsState(
@@ -22,12 +23,20 @@ class AnnouncementsViewModel(
     val state: StateFlow<AnnouncementsState> = _state
 
     init {
-        load()
+        viewModelScope.launch {
+            session.activeStudent.collectLatest {
+                load()
+            }
+        }
     }
 
     fun load() {
-        val account = session.currentAccount ?: return
-        val api = session.api ?: return
+        val account = session.currentAccount
+        val api = session.api
+        if (account == null || api == null) {
+            _state.value = AnnouncementsState(isLoading = false)
+            return
+        }
 
         viewModelScope.launch {
             _state.value = AnnouncementsState(isLoading = true)

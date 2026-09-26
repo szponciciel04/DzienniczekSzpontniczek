@@ -6,6 +6,8 @@ import io.github.szpontium.api.hebe.models.Exam
 import io.github.szpontium.session.ApiSession
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDate
@@ -13,7 +15,6 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.minus
 import kotlinx.datetime.plus
 import kotlinx.datetime.toLocalDateTime
-import kotlinx.coroutines.launch
 import kotlin.time.Clock
 
 data class ExamsState(
@@ -37,7 +38,11 @@ class ExamsViewModel(
     val state: StateFlow<ExamsState> = _state
 
     init {
-        loadWeek(_state.value.weekStart)
+        viewModelScope.launch {
+            session.activeStudent.collectLatest {
+                loadWeek(_state.value.weekStart)
+            }
+        }
     }
 
     fun previousWeek() {
@@ -55,8 +60,13 @@ class ExamsViewModel(
     }
 
     private fun loadWeek(weekStart: LocalDate) {
-        val account = session.currentAccount ?: return
-        val api = session.api ?: return
+        val account = session.currentAccount
+        val api = session.api
+        if (account == null || api == null) {
+            _state.value = ExamsState(isLoading = false, weekStart = weekStart)
+            return
+        }
+
         val weekEnd = weekStart.plus(6, DateTimeUnit.DAY)
 
         viewModelScope.launch {

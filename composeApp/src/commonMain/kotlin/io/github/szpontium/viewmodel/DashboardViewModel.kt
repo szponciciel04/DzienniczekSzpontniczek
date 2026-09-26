@@ -5,34 +5,42 @@ import androidx.lifecycle.viewModelScope
 import io.github.szpontium.api.hebe.models.Account
 import io.github.szpontium.api.hebe.models.LuckyNumber
 import io.github.szpontium.session.ApiSession
+import io.github.szpontium.session.SessionStorage
+import io.github.szpontium.session.StudentSession
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 class DashboardViewModel(
-    private val session: ApiSession
+    private val session: ApiSession,
+    private val sessionStorage: SessionStorage
 ) : ViewModel() {
 
-    private val _accounts = MutableStateFlow(session.accounts)
-    val accounts: StateFlow<List<Account>> = _accounts
-
-    private val _selectedIndex = MutableStateFlow(session.selectedAccountIndex)
-    val selectedIndex: StateFlow<Int> = _selectedIndex
+    val activeStudent: StateFlow<StudentSession?> = session.activeStudent
+    val studentSessions: StateFlow<List<StudentSession>> = session.studentSessions
 
     private val _luckyNumber = MutableStateFlow<LuckyNumber?>(null)
-    val luckyNumber: StateFlow<LuckyNumber?> = _luckyNumber
+    val luckyNumber: StateFlow<LuckyNumber?> = _luckyNumber.asStateFlow()
 
     val currentAccount: Account?
         get() = session.currentAccount
 
     init {
-        loadLuckyNumber()
+        viewModelScope.launch {
+            session.activeStudent.collectLatest {
+                _luckyNumber.value = null
+                loadLuckyNumber()
+            }
+        }
     }
 
-    fun selectAccount(index: Int) {
-        session.selectedAccountIndex = index
-        _selectedIndex.value = index
-        loadLuckyNumber()
+    fun selectStudent(studentId: String) {
+        session.selectStudent(studentId)
+        viewModelScope.launch {
+            sessionStorage.setActiveStudentId(studentId)
+        }
     }
 
     private fun loadLuckyNumber() {

@@ -2,13 +2,16 @@ package io.github.szpontium.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import io.github.szpontium.api.prometheus.PrometheusMessagesApi
+import io.github.szpontium.api.librus.LibrusMapper
+import io.github.szpontium.api.librus.SzpontLibrusAdapterApi
 import io.github.szpontium.api.prometheus.models.VulcanMailboxName
 import io.github.szpontium.session.ApiSession
 import io.github.szpontium.ui.model.UiMessage
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import kotlinx.datetime.LocalDateTime
 
 enum class MessageTab {
     RECEIVED, SENT, DELETED
@@ -29,7 +32,11 @@ class MessagesViewModel(
     val state: StateFlow<MessagesState> = _state
 
     init {
-        loadMessages()
+        viewModelScope.launch {
+            session.activeStudent.collectLatest {
+                loadMessages()
+            }
+        }
     }
 
     fun setTab(tab: MessageTab) {
@@ -40,8 +47,13 @@ class MessagesViewModel(
     }
 
     fun loadMessages() {
-        val account = session.currentAccount ?: return
-        val api = session.api ?: return
+        val account = session.currentAccount
+        val api = session.api
+        if (account == null || api == null) {
+            _state.value = MessagesState(isLoading = false)
+            return
+        }
+
         val currentTab = _state.value.currentTab
 
         viewModelScope.launch {
@@ -49,10 +61,10 @@ class MessagesViewModel(
             try {
                 if (account.unit.restUrl == "librus" || session.librusApi != null) {
                     val librusApi = session.librusApi
-                        ?: (api as? io.github.szpontium.api.librus.SzpontLibrusAdapterApi)?.librusApi
+                        ?: (api as? SzpontLibrusAdapterApi)?.librusApi
                     if (librusApi != null) {
                         val lMessages = librusApi.getMessages()
-                        val uiMessages = io.github.szpontium.api.librus.LibrusMapper.mapMessages(lMessages)
+                        val uiMessages = LibrusMapper.mapMessages(lMessages)
                         _state.value = _state.value.copy(isLoading = false, messages = uiMessages)
                         return@launch
                     }
@@ -92,7 +104,7 @@ class MessagesViewModel(
                             id = pMsg.apiGlobalKey,
                             title = pMsg.temat,
                             senderOrRecipient = pMsg.korespondenci ?: "Nieznany",
-                            date = try { kotlinx.datetime.LocalDateTime.parse(pMsg.data.removeSuffix("Z")) } catch (e: Exception) { null },
+                            date = try { LocalDateTime.parse(pMsg.data.removeSuffix("Z")) } catch (e: Exception) { null },
                             isUnread = !pMsg.przeczytana,
                             hasAttachments = pMsg.hasZalaczniki
                         )
