@@ -13,6 +13,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Announcement
+import androidx.compose.material.icons.automirrored.outlined.Message
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.outlined.Book
@@ -47,7 +48,7 @@ fun MoreScreen(onNavigate: (Route) -> Unit) {
     val items = listOf(
         Triple(Icons.Outlined.EmojiEvents, "Uwagi i osiągnięcia", Route.Notes),
         Triple(Icons.AutoMirrored.Outlined.Announcement, "Ogłoszenia", Route.Announcements),
-        Triple(Icons.Outlined.Person, "Wiadomości", Route.Messages),
+        Triple(Icons.AutoMirrored.Outlined.Message, "Wiadomości", Route.Messages),
         Triple(Icons.Outlined.Book, "Zadania domowe", Route.Homework),
         Triple(Icons.Outlined.Person, "Konto i uczniowie", Route.Account)
     )
