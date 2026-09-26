@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
@@ -36,12 +37,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.szpontium.api.hebe.models.Schedule
+import io.github.szpontium.api.hebe.models.effectiveNoteOrReason
+import io.github.szpontium.api.hebe.models.effectiveRoom
+import io.github.szpontium.api.hebe.models.effectiveSubject
+import io.github.szpontium.api.hebe.models.effectiveTeacher
+import io.github.szpontium.api.hebe.models.isCanceled
+import io.github.szpontium.api.hebe.models.isMerge
+import io.github.szpontium.api.hebe.models.isRescheduled
 import io.github.szpontium.theme.expressiveGroupShape
 import io.github.szpontium.viewmodel.TimetableViewModel
 import io.github.szpontium.viewmodel.mondayOfWeek
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.DayOfWeek
-import kotlinx.datetime.LocalDate
 import kotlinx.datetime.plus
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -154,28 +161,23 @@ fun TimetableScreen(viewModel: TimetableViewModel = koinViewModel()) {
 
 @Composable
 private fun LessonCard(lesson: Schedule, shape: Shape) {
+    val isCanceled = lesson.isCanceled
     val isSubstitution = lesson.substitution != null
-    val isCancelled = lesson.substitution?.change?.type == 2
+    val isMerge = lesson.isMerge
+    val isRescheduled = lesson.isRescheduled
+
     val darkTheme = isSystemInDarkTheme()
-    val substitutionContainerColor = if (!darkTheme) {
-        substitutionContainerLight
-    } else {
-        substitutionContainerDark
-    }
-    val substitutionOnContainerColor = if (!darkTheme) {
-        substitutionOnContainerLight
-    } else {
-        substitutionOnContainerDark
-    }
+    val substitutionContainerColor = if (!darkTheme) substitutionContainerLight else substitutionContainerDark
+    val substitutionOnContainerColor = if (!darkTheme) substitutionOnContainerLight else substitutionOnContainerDark
 
     val containerColor = when {
-        isCancelled -> MaterialTheme.colorScheme.errorContainer
+        isCanceled -> MaterialTheme.colorScheme.errorContainer
         isSubstitution -> substitutionContainerColor
         else -> MaterialTheme.colorScheme.surfaceContainerLow
     }
 
     val onContainerColor = when {
-        isCancelled -> MaterialTheme.colorScheme.onErrorContainer
+        isCanceled -> MaterialTheme.colorScheme.onErrorContainer
         isSubstitution -> substitutionOnContainerColor
         else -> MaterialTheme.colorScheme.onSurface
     }
@@ -197,13 +199,13 @@ private fun LessonCard(lesson: Schedule, shape: Shape) {
             )
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = lesson.substitution?.subject?.name ?: lesson.subject?.name ?: "Brak nazwy",
+                    text = lesson.effectiveSubject?.name ?: "Brak nazwy",
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.SemiBold,
                     color = onContainerColor
                 )
-                val teacher = lesson.substitution?.teacherPrimary?.displayName
-                    ?: lesson.teacherPrimary?.displayName
+
+                val teacher = lesson.effectiveTeacher?.displayName
                 if (teacher != null) {
                     Text(
                         text = teacher,
@@ -211,7 +213,8 @@ private fun LessonCard(lesson: Schedule, shape: Shape) {
                         color = onContainerColor.copy(alpha = 0.88f)
                     )
                 }
-                val room = lesson.substitution?.room?.code ?: lesson.room?.code
+
+                val room = lesson.effectiveRoom?.code
                 if (room != null) {
                     Text(
                         text = "Sala: $room",
@@ -219,18 +222,50 @@ private fun LessonCard(lesson: Schedule, shape: Shape) {
                         color = onContainerColor.copy(alpha = 0.88f)
                     )
                 }
-                if (isCancelled) {
+
+                val note = lesson.effectiveNoteOrReason
+                if (!note.isNullOrBlank()) {
                     Text(
-                        text = "ODWOŁANA",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.error
+                        text = note,
+                        style = MaterialTheme.typography.bodySmall,
+                        fontWeight = FontWeight.Medium,
+                        color = onContainerColor.copy(alpha = 0.95f)
                     )
-                } else if (isSubstitution) {
-                    Text(
-                        text = "Zastępstwo",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = substitutionOnContainerColor
-                    )
+                }
+
+                when {
+                    isCanceled -> {
+                        Text(
+                            text = "ODWOŁANA",
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.error
+                        )
+                    }
+                    isMerge -> {
+                        Text(
+                            text = "Połączone grupy",
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = substitutionOnContainerColor
+                        )
+                    }
+                    isRescheduled -> {
+                        Text(
+                            text = "Przeniesiona",
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = substitutionOnContainerColor
+                        )
+                    }
+                    isSubstitution -> {
+                        Text(
+                            text = "Zastępstwo",
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = substitutionOnContainerColor
+                        )
+                    }
                 }
             }
             Text(

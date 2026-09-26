@@ -3,6 +3,7 @@ package io.github.szpontium.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.github.szpontium.api.hebe.models.Schedule
+import io.github.szpontium.api.hebe.models.isCanceled
 import io.github.szpontium.session.ApiSession
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -38,8 +39,22 @@ data class TimetableState(
     val error: String? = null
 ) {
     val dayLessons: List<Schedule>
-        get() = schedule.filter { it.date == selectedDate }
-            .sortedBy { it.timeSlot.position }
+        get() {
+            val rawLessonsForDay = schedule.filter { it.date == selectedDate }
+            val byPosition = rawLessonsForDay.groupBy { it.timeSlot.position }
+            val processed = mutableListOf<Schedule>()
+
+            for ((_, lessons) in byPosition) {
+                val activeSubstitute = lessons.firstOrNull { it.substitution != null && !it.isCanceled }
+                if (activeSubstitute != null) {
+                    processed.add(activeSubstitute)
+                } else {
+                    processed.addAll(lessons)
+                }
+            }
+
+            return processed.sortedBy { it.timeSlot.position }
+        }
 }
 
 class TimetableViewModel(
