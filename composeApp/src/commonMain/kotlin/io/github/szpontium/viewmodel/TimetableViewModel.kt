@@ -17,17 +17,29 @@ import kotlinx.datetime.plus
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Clock
 
+private fun initialSelectedDate(): LocalDate {
+    val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
+    return when (today.dayOfWeek) {
+        DayOfWeek.SATURDAY -> today.plus(2, DateTimeUnit.DAY)
+        DayOfWeek.SUNDAY -> today.plus(1, DateTimeUnit.DAY)
+        else -> today
+    }
+}
+
+fun mondayOfWeek(date: LocalDate): LocalDate {
+    val daysFromMonday = (date.dayOfWeek.ordinal - DayOfWeek.MONDAY.ordinal + 7) % 7
+    return date.minus(daysFromMonday, DateTimeUnit.DAY)
+}
+
 data class TimetableState(
     val isLoading: Boolean = false,
     val schedule: List<Schedule> = emptyList(),
-    val weekStart: LocalDate = mondayOfCurrentWeek(),
+    val selectedDate: LocalDate = initialSelectedDate(),
     val error: String? = null
-)
-
-private fun mondayOfCurrentWeek(): LocalDate {
-    val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
-    val daysFromMonday = (today.dayOfWeek.ordinal - DayOfWeek.MONDAY.ordinal + 7) % 7
-    return today.minus(daysFromMonday, DateTimeUnit.DAY)
+) {
+    val dayLessons: List<Schedule>
+        get() = schedule.filter { it.date == selectedDate }
+            .sortedBy { it.timeSlot.position }
 }
 
 class TimetableViewModel(
@@ -40,33 +52,49 @@ class TimetableViewModel(
     init {
         viewModelScope.launch {
             session.activeStudent.collectLatest {
-                loadWeek(_state.value.weekStart)
+                val weekStart = mondayOfWeek(_state.value.selectedDate)
+                loadWeek(weekStart)
             }
         }
     }
 
-    fun previousWeek() {
-        val newStart = _state.value.weekStart.minus(7, DateTimeUnit.DAY)
-        loadWeek(newStart)
+    fun selectDate(date: LocalDate) {
+        val currentWeekStart = mondayOfWeek(_state.value.selectedDate)
+        val newWeekStart = mondayOfWeek(date)
+        _state.value = _state.value.copy(selectedDate = date)
+        if (currentWeekStart != newWeekStart || _state.value.schedule.isEmpty()) {
+            loadWeek(newWeekStart)
+        }
     }
 
-    fun nextWeek() {
-        val newStart = _state.value.weekStart.plus(7, DateTimeUnit.DAY)
-        loadWeek(newStart)
+    fun previousDay() {
+        var newDate = _state.value.selectedDate.minus(1, DateTimeUnit.DAY)
+        if (newDate.dayOfWeek == DayOfWeek.SUNDAY) {
+            newDate = newDate.minus(2, DateTimeUnit.DAY)
+        }
+        selectDate(newDate)
+    }
+
+    fun nextDay() {
+        var newDate = _state.value.selectedDate.plus(1, DateTimeUnit.DAY)
+        if (newDate.dayOfWeek == DayOfWeek.SATURDAY) {
+            newDate = newDate.plus(2, DateTimeUnit.DAY)
+        }
+        selectDate(newDate)
     }
 
     private fun loadWeek(weekStart: LocalDate) {
         val account = session.currentAccount
         val api = session.api
         if (account == null || api == null) {
-            _state.value = TimetableState(isLoading = false, weekStart = weekStart)
+            _state.value = _state.value.copy(isLoading = false)
             return
         }
 
         val weekEnd = weekStart.plus(6, DateTimeUnit.DAY)
 
         viewModelScope.launch {
-            _state.value = _state.value.copy(isLoading = true, weekStart = weekStart)
+            _state.value = _state.value.copy(isLoading = true)
             try {
                 val schedule = api.getSchedule(
                     restUrl = account.unit.restUrl,
@@ -74,15 +102,16 @@ class TimetableViewModel(
                     dateFrom = weekStart,
                     dateTo = weekEnd
                 )
-                _state.value = TimetableState(
+                _state.value = _state.value.copy(
+                    isLoading = false,
                     schedule = schedule.sortedWith(
                         compareBy({ it.date }, { it.timeSlot.position })
                     ),
-                    weekStart = weekStart
+                    error = null
                 )
             } catch (e: Exception) {
-                _state.value = TimetableState(
-                    weekStart = weekStart,
+                _state.value = _state.value.copy(
+                    isLoading = false,
                     error = e.message ?: "Błąd ładowania planu"
                 )
             }

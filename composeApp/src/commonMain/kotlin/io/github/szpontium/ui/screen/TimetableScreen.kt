@@ -11,16 +11,19 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -35,6 +38,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.szpontium.api.hebe.models.Schedule
 import io.github.szpontium.theme.expressiveGroupShape
 import io.github.szpontium.viewmodel.TimetableViewModel
+import io.github.szpontium.viewmodel.mondayOfWeek
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDate
@@ -51,36 +55,70 @@ private val POLISH_DAYS = mapOf(
     DayOfWeek.SUNDAY to "Niedziela"
 )
 
+private val POLISH_SHORT_DAYS = listOf("Pn", "Wt", "Śr", "Cz", "Pt")
+
 private val substitutionContainerLight = Color(0xFFFFF3CD)
 private val substitutionContainerDark = Color(0xFF5C4A00)
 private val substitutionOnContainerLight = Color(0xFF4A3A00)
 private val substitutionOnContainerDark = Color(0xFFFFE08A)
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TimetableScreen(viewModel: TimetableViewModel = koinViewModel()) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val selectedDate = state.selectedDate
+    val weekStart = mondayOfWeek(selectedDate)
 
     Column(modifier = Modifier.fillMaxSize()) {
-        // Week navigation header
+        // Day navigation bar
         Surface(color = MaterialTheme.colorScheme.surfaceContainer) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 6.dp)
-            ) {
-                IconButton(onClick = { viewModel.previousWeek() }) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Poprzedni tydzień")
+            Column(modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp)) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                ) {
+                    IconButton(onClick = { viewModel.previousDay() }) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Poprzedni dzień")
+                    }
+                    Text(
+                        text = "${POLISH_DAYS[selectedDate.dayOfWeek] ?: selectedDate.dayOfWeek.name}, ${selectedDate.day}.${selectedDate.monthNumber}",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                    IconButton(onClick = { viewModel.nextDay() }) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = "Następny dzień")
+                    }
                 }
-                val weekEnd = state.weekStart.plus(4, DateTimeUnit.DAY)
-                Text(
-                    text = "${state.weekStart.day}.${state.weekStart.monthNumber} – ${weekEnd.day}.${weekEnd.monthNumber}",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold
-                )
-                IconButton(onClick = { viewModel.nextWeek() }) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = "Następny tydzień")
+
+                Spacer(Modifier.height(4.dp))
+
+                // Monday - Friday Day Selector Row
+                SingleChoiceSegmentedButtonRow(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                ) {
+                    (0..4).forEach { dayOffset ->
+                        val dayDate = weekStart.plus(dayOffset, DateTimeUnit.DAY)
+                        val isSelected = dayDate == selectedDate
+                        val dayLabel = "${POLISH_SHORT_DAYS[dayOffset]} ${dayDate.day}"
+
+                        SegmentedButton(
+                            selected = isSelected,
+                            onClick = { viewModel.selectDate(dayDate) },
+                            shape = SegmentedButtonDefaults.itemShape(index = dayOffset, count = 5),
+                            label = {
+                                Text(
+                                    text = dayLabel,
+                                    style = MaterialTheme.typography.labelMedium,
+                                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
+                                )
+                            }
+                        )
+                    }
                 }
             }
         }
@@ -89,29 +127,21 @@ fun TimetableScreen(viewModel: TimetableViewModel = koinViewModel()) {
             state.isLoading -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator()
             }
-            state.error != null -> ErrorScreen(state.error!!, onRetry = { viewModel.nextWeek() })
-            state.schedule.isEmpty() -> EmptyScreen("Brak lekcji w tym tygodniu")
+            state.error != null -> ErrorScreen(state.error!!, onRetry = { viewModel.selectDate(selectedDate) })
+            state.dayLessons.isEmpty() -> EmptyScreen("Brak lekcji w tym dniu")
             else -> {
-                val byDay = state.schedule.groupBy { it.date }
-                LazyColumn(modifier = Modifier.fillMaxSize().padding(top = 8.dp)) {
-                    (0..4).forEach { dayOffset ->
-                        val date = state.weekStart.plus(dayOffset, DateTimeUnit.DAY)
-                        val lessons = byDay[date] ?: emptyList()
-                        if (lessons.isNotEmpty()) {
-                            item {
-                                DayHeader(date)
-                                Column(modifier = Modifier.padding(horizontal = 16.dp)) {
-                                    lessons.forEachIndexed { index, lesson ->
-                                        LessonCard(
-                                            lesson = lesson,
-                                            shape = expressiveGroupShape(index = index, count = lessons.size)
-                                        )
-                                        if (index < lessons.size - 1) {
-                                            Spacer(Modifier.height(3.dp))
-                                        }
-                                    }
+                val dayLessons = state.dayLessons
+                LazyColumn(modifier = Modifier.fillMaxSize().padding(top = 12.dp)) {
+                    item {
+                        Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+                            dayLessons.forEachIndexed { index, lesson ->
+                                LessonCard(
+                                    lesson = lesson,
+                                    shape = expressiveGroupShape(index = index, count = dayLessons.size)
+                                )
+                                if (index < dayLessons.size - 1) {
+                                    Spacer(Modifier.height(3.dp))
                                 }
-                                Spacer(Modifier.height(12.dp))
                             }
                         }
                     }
@@ -119,23 +149,6 @@ fun TimetableScreen(viewModel: TimetableViewModel = koinViewModel()) {
                 }
             }
         }
-    }
-}
-
-@Composable
-private fun DayHeader(date: LocalDate) {
-    Surface(
-        color = MaterialTheme.colorScheme.secondaryContainer,
-        shape = RoundedCornerShape(12.dp),
-        modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp)
-    ) {
-        Text(
-            text = "${POLISH_DAYS[date.dayOfWeek] ?: date.dayOfWeek.name}, ${date.day}.${date.monthNumber}",
-            style = MaterialTheme.typography.labelLarge,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onSecondaryContainer,
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
-        )
     }
 }
 
