@@ -21,7 +21,6 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
@@ -37,6 +36,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -47,6 +47,8 @@ import io.github.szpontium.navigation.CandidateStudent
 import io.github.szpontium.viewmodel.LoginEvent
 import io.github.szpontium.viewmodel.LoginViewModel
 import org.koin.compose.viewmodel.koinViewModel
+
+private val inputShape = RoundedCornerShape(16.dp)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -156,12 +158,14 @@ private fun EduVulcanLoginTab(
             onValueChange = { login = it },
             label = { Text("Login (e-mail)") },
             singleLine = true,
-            shape = RoundedCornerShape(16.dp),
+            shape = inputShape,
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Email,
                 imeAction = ImeAction.Next
             ),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(inputShape)
         )
         Spacer(Modifier.height(12.dp))
         OutlinedTextField(
@@ -169,13 +173,15 @@ private fun EduVulcanLoginTab(
             onValueChange = { password = it },
             label = { Text("Hasło") },
             singleLine = true,
-            shape = RoundedCornerShape(16.dp),
+            shape = inputShape,
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Password,
                 imeAction = ImeAction.Done
             ),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(inputShape)
         )
         Spacer(Modifier.height(24.dp))
         Button(
@@ -215,9 +221,11 @@ private fun DzienniczekLoginTab(
             onValueChange = { symbol = it },
             label = { Text("Symbol szkoły") },
             singleLine = true,
-            shape = RoundedCornerShape(16.dp),
+            shape = inputShape,
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(inputShape)
         )
         Spacer(Modifier.height(12.dp))
         OutlinedTextField(
@@ -225,9 +233,11 @@ private fun DzienniczekLoginTab(
             onValueChange = { token = it },
             label = { Text("Token") },
             singleLine = true,
-            shape = RoundedCornerShape(16.dp),
+            shape = inputShape,
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(inputShape)
         )
         Spacer(Modifier.height(12.dp))
         OutlinedTextField(
@@ -235,13 +245,15 @@ private fun DzienniczekLoginTab(
             onValueChange = { pin = it },
             label = { Text("PIN") },
             singleLine = true,
-            shape = RoundedCornerShape(16.dp),
+            shape = inputShape,
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.NumberPassword,
                 imeAction = ImeAction.Done
             ),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(inputShape)
         )
         Spacer(Modifier.height(8.dp))
         Text(
@@ -301,12 +313,14 @@ private fun LibrusLoginTab(
             onValueChange = { email = it },
             label = { Text("E-mail (Konto LIBRUS)") },
             singleLine = true,
-            shape = RoundedCornerShape(16.dp),
+            shape = inputShape,
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Email,
                 imeAction = ImeAction.Next
             ),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(inputShape)
         )
         Spacer(Modifier.height(12.dp))
         OutlinedTextField(
@@ -314,13 +328,15 @@ private fun LibrusLoginTab(
             onValueChange = { password = it },
             label = { Text("Hasło") },
             singleLine = true,
-            shape = RoundedCornerShape(16.dp),
+            shape = inputShape,
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Password,
                 imeAction = ImeAction.Done
             ),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(inputShape)
         )
         Spacer(Modifier.height(24.dp))
         Button(
