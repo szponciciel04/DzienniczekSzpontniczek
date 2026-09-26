@@ -18,7 +18,7 @@ data class Announcement(
     @SerialName("From") val dateFrom: LocalDate,
     @SerialName("To") val dateTo: LocalDate,
     @SerialName("Sender") val sender: Employee,
-    @SerialName("Attachments") val attachments: List<Attachment>,
+    @SerialName("Attachments") val attachments: List<Attachment>? = emptyList(),
     @SerialName("CreatedAt") val createdAt: LocalDateTime,
     @SerialName("ModifiedAt") val modifiedAt: LocalDateTime
 )

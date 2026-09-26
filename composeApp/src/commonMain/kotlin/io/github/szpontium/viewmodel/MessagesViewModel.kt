@@ -112,13 +112,13 @@ class MessagesViewModel(
                             id = hMsg.id,
                             title = hMsg.subject,
                             senderOrRecipient = if (currentTab == MessageTab.SENT) {
-                                hMsg.receiver.firstOrNull()?.name ?: "Nieznany"
+                                hMsg.receiver?.firstOrNull()?.name ?: "Nieznany"
                             } else {
                                 hMsg.sender.name
                             },
                             date = hMsg.sentAt,
                             isUnread = hMsg.status == 0,
-                            hasAttachments = hMsg.attachments.isNotEmpty(),
+                            hasAttachments = hMsg.attachments?.isNotEmpty() == true,
                             content = hMsg.content
                         )
                     }

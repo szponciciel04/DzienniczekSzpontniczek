@@ -24,6 +24,6 @@ data class Homework(
     @SerialName("DeadlineAt") val deadline: LocalDate,
     @SerialName("Creator") val creator: Employee,
     @SerialName("Subject") val subject: Subject,
-    @SerialName("Attachments") val attachments: List<Attachment>,
+    @SerialName("Attachments") val attachments: List<Attachment>? = emptyList(),
     @SerialName("Didactics") val didactics: JsonElement? = null
 )

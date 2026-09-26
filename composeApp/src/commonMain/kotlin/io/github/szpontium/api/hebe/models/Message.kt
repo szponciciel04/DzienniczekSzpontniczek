@@ -31,7 +31,7 @@ data class Message(
     @SerialName("ReadAt") val readAt: LocalDateTime? = null,
     @SerialName("Status") val status: Int,
     @SerialName("Sender") val sender: MessageAddress,
-    @SerialName("Receiver") val receiver: List<MessageAddress>,
-    @SerialName("Attachments") val attachments: List<Attachment>,
+    @SerialName("Receiver") val receiver: List<MessageAddress>? = emptyList(),
+    @SerialName("Attachments") val attachments: List<Attachment>? = emptyList(),
     @SerialName("Withdrawn") val withdrawn: Boolean
 )
