@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Backpack
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.Home
@@ -30,6 +31,7 @@ import androidx.compose.material.icons.outlined.MoreHoriz
 import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.NavigationBar
@@ -94,6 +96,12 @@ fun DashboardScreen(
 
     val backStack = remember { mutableStateListOf<Route>(Route.Start) }
     val currentRoute = backStack.lastOrNull()
+
+    val isSubScreen = currentRoute is Route.MessageDetails || currentRoute in listOf(
+        Route.Notes,
+        Route.Announcements,
+        Route.Account
+    )
 
     val pageTitle = when (currentRoute) {
         is Route.Start -> "Start"
@@ -223,6 +231,16 @@ fun DashboardScreen(
                         fontWeight = FontWeight.Bold
                     )
                 },
+                navigationIcon = {
+                    if (isSubScreen) {
+                        IconButton(onClick = { backStack.removeLastOrNull() }) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = "Wróć"
+                            )
+                        }
+                    }
+                },
                 actions = {
                     luckyNumber?.let {
                         if (it.number != 0) {
@@ -326,7 +344,7 @@ fun DashboardScreen(
                 entry<Route.Notes> { NotesScreen() }
                 entry<Route.Announcements> { AnnouncementsScreen() }
                 entry<Route.Messages> { MessagesScreen(onNavigate = { backStack.add(it) }) }
-                entry<Route.MessageDetails> { MessageDetailsScreen(route = it, onBack = { backStack.removeLastOrNull() }) }
+                entry<Route.MessageDetails> { MessageDetailsScreen(route = it) }
                 entry<Route.Account> { AccountScreen(onLogout = onLogout, onNavigateToAddAccount = onNavigateToAddAccount) }
             }
         )
