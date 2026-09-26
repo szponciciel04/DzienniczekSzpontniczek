@@ -4,20 +4,23 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Backpack
 import androidx.compose.material.icons.filled.CalendarToday
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.Looks6
 import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material.icons.filled.Settings
@@ -27,19 +30,20 @@ import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Looks6
 import androidx.compose.material.icons.outlined.MoreHoriz
 import androidx.compose.material.icons.outlined.Star
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -49,6 +53,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
@@ -56,6 +61,7 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import io.github.szpontium.navigation.Route
+import io.github.szpontium.theme.expressiveGroupShape
 import io.github.szpontium.viewmodel.DashboardViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -86,28 +92,156 @@ fun DashboardScreen(
     val currentAccount = viewModel.currentAccount
     val enabledStudents = studentSessions.filter { it.isEnabled }
 
-    var isMenuExpanded by remember { mutableStateOf(false) }
+    var showStudentBottomSheet by remember { mutableStateOf(false) }
 
     val backStack = remember { mutableStateListOf<Route>(Route.Start) }
     val currentRoute = backStack.lastOrNull()
+
+    if (showStudentBottomSheet) {
+        ModalBottomSheet(
+            onDismissRequest = { showStudentBottomSheet = false },
+            sheetState = rememberModalBottomSheetState()
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp, vertical = 8.dp)
+            ) {
+                Text(
+                    text = "Konta uczniów",
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(bottom = 16.dp)
+                )
+
+                enabledStudents.forEachIndexed { index, student ->
+                    val isSelected = student.id == activeStudent?.id
+                    Surface(
+                        onClick = {
+                            showStudentBottomSheet = false
+                            viewModel.selectStudent(student.id)
+                        },
+                        shape = expressiveGroupShape(index = index, count = enabledStudents.size),
+                        color = if (isSelected)
+                            MaterialTheme.colorScheme.primaryContainer
+                        else
+                            MaterialTheme.colorScheme.surfaceContainerLow,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 2.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(16.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Surface(
+                                shape = CircleShape,
+                                color = if (isSelected)
+                                    MaterialTheme.colorScheme.primary
+                                else
+                                    MaterialTheme.colorScheme.secondaryContainer,
+                                modifier = Modifier.size(40.dp)
+                            ) {
+                                Box(contentAlignment = Alignment.Center) {
+                                    val initials = "${student.account.pupil.firstName.firstOrNull() ?: ""}${student.account.pupil.surname.firstOrNull() ?: ""}"
+                                    Text(
+                                        text = initials,
+                                        style = MaterialTheme.typography.titleMedium,
+                                        fontWeight = FontWeight.Bold,
+                                        color = if (isSelected)
+                                            MaterialTheme.colorScheme.onPrimary
+                                        else
+                                            MaterialTheme.colorScheme.onSecondaryContainer
+                                    )
+                                }
+                            }
+                            Spacer(Modifier.width(16.dp))
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    text = "${student.account.pupil.firstName} ${student.account.pupil.surname}",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.SemiBold
+                                )
+                                Text(
+                                    text = student.account.unit.displayName.ifBlank { student.account.unit.name },
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                            RadioButton(
+                                selected = isSelected,
+                                onClick = {
+                                    showStudentBottomSheet = false
+                                    viewModel.selectStudent(student.id)
+                                }
+                            )
+                        }
+                    }
+                }
+
+                Spacer(Modifier.height(16.dp))
+                OutlinedButton(
+                    onClick = {
+                        showStudentBottomSheet = false
+                        if (currentRoute != Route.More) {
+                            backStack.clear()
+                            backStack.add(Route.More)
+                        }
+                        backStack.add(Route.Account)
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Icon(imageVector = Icons.Default.Settings, contentDescription = null)
+                    Spacer(Modifier.width(8.dp))
+                    Text("Zarządzaj uczniami / Dodaj konto")
+                }
+                Spacer(Modifier.height(16.dp))
+            }
+        }
+    }
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
-                    Box {
+                    Surface(
+                        onClick = { if (enabledStudents.size > 1) showStudentBottomSheet = true },
+                        shape = RoundedCornerShape(20.dp),
+                        color = MaterialTheme.colorScheme.surfaceContainerHigh
+                    ) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier
-                                .clickable { isMenuExpanded = true }
-                                .padding(vertical = 4.dp)
+                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
                         ) {
+                            val initials = currentAccount?.let {
+                                "${it.pupil.firstName.firstOrNull() ?: ""}${it.pupil.surname.firstOrNull() ?: ""}"
+                            } ?: ""
+
+                            if (initials.isNotBlank()) {
+                                Surface(
+                                    shape = CircleShape,
+                                    color = MaterialTheme.colorScheme.primaryContainer,
+                                    modifier = Modifier.size(32.dp)
+                                ) {
+                                    Box(contentAlignment = Alignment.Center) {
+                                        Text(
+                                            text = initials,
+                                            style = MaterialTheme.typography.labelLarge,
+                                            fontWeight = FontWeight.Bold,
+                                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                                        )
+                                    }
+                                }
+                                Spacer(Modifier.width(10.dp))
+                            }
+
                             Column {
                                 Text(
                                     text = currentAccount?.let {
                                         "${it.pupil.firstName} ${it.pupil.surname}"
                                     } ?: "Brak konta",
-                                    style = MaterialTheme.typography.titleMedium
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.Bold
                                 )
                                 Text(
                                     text = currentAccount?.unit?.displayName?.ifBlank { currentAccount.unit.name } ?: "",
@@ -115,67 +249,15 @@ fun DashboardScreen(
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
-                            if (enabledStudents.size > 1) {
-                                Icon(
-                                    imageVector = Icons.Default.ArrowDropDown,
-                                    contentDescription = "Zmień ucznia"
-                                )
-                            }
-                        }
 
-                        DropdownMenu(
-                            expanded = isMenuExpanded,
-                            onDismissRequest = { isMenuExpanded = false }
-                        ) {
-                            enabledStudents.forEach { student ->
-                                val isSelected = student.id == activeStudent?.id
-                                DropdownMenuItem(
-                                    text = {
-                                        Column {
-                                            Text(
-                                                text = "${student.account.pupil.firstName} ${student.account.pupil.surname}",
-                                                style = MaterialTheme.typography.bodyLarge
-                                            )
-                                            Text(
-                                                text = student.account.unit.displayName.ifBlank { student.account.unit.name },
-                                                style = MaterialTheme.typography.bodySmall,
-                                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                                            )
-                                        }
-                                    },
-                                    leadingIcon = if (isSelected) {
-                                        {
-                                            Icon(
-                                                imageVector = Icons.Default.Check,
-                                                contentDescription = "Wybrany",
-                                                tint = MaterialTheme.colorScheme.primary
-                                            )
-                                        }
-                                    } else null,
-                                    onClick = {
-                                        isMenuExpanded = false
-                                        viewModel.selectStudent(student.id)
-                                    }
+                            if (enabledStudents.size > 1) {
+                                Spacer(Modifier.width(6.dp))
+                                Icon(
+                                    imageVector = Icons.Default.KeyboardArrowDown,
+                                    contentDescription = "Zmień ucznia",
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
-                            HorizontalDivider()
-                            DropdownMenuItem(
-                                text = { Text("Zarządzaj uczniami") },
-                                leadingIcon = {
-                                    Icon(
-                                        imageVector = Icons.Default.Settings,
-                                        contentDescription = "Zarządzaj uczniami"
-                                    )
-                                },
-                                onClick = {
-                                    isMenuExpanded = false
-                                    if (currentRoute != Route.More) {
-                                        backStack.clear()
-                                        backStack.add(Route.More)
-                                    }
-                                    backStack.add(Route.Account)
-                                }
-                            )
                         }
                     }
                 },
