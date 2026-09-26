@@ -15,12 +15,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Backpack
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.Looks6
 import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material.icons.filled.Settings
@@ -96,6 +94,21 @@ fun DashboardScreen(
 
     val backStack = remember { mutableStateListOf<Route>(Route.Start) }
     val currentRoute = backStack.lastOrNull()
+
+    val pageTitle = when (currentRoute) {
+        is Route.Start -> "Start"
+        is Route.Grades -> "Oceny"
+        is Route.Timetable -> "Plan lekcji"
+        is Route.Exams -> "Sprawdziany"
+        is Route.Homework -> "Zadania domowe"
+        is Route.More -> "Więcej"
+        is Route.Notes -> "Uwagi"
+        is Route.Announcements -> "Ogłoszenia"
+        is Route.Messages -> "Wiadomości"
+        is Route.MessageDetails -> "Wiadomość"
+        is Route.Account -> "Konto"
+        else -> "Szpontium"
+    }
 
     if (showStudentBottomSheet) {
         ModalBottomSheet(
@@ -204,62 +217,11 @@ fun DashboardScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Surface(
-                        onClick = { if (enabledStudents.size > 1) showStudentBottomSheet = true },
-                        shape = RoundedCornerShape(20.dp),
-                        color = MaterialTheme.colorScheme.surfaceContainerHigh
-                    ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
-                        ) {
-                            val initials = currentAccount?.let {
-                                "${it.pupil.firstName.firstOrNull() ?: ""}${it.pupil.surname.firstOrNull() ?: ""}"
-                            } ?: ""
-
-                            if (initials.isNotBlank()) {
-                                Surface(
-                                    shape = CircleShape,
-                                    color = MaterialTheme.colorScheme.primaryContainer,
-                                    modifier = Modifier.size(32.dp)
-                                ) {
-                                    Box(contentAlignment = Alignment.Center) {
-                                        Text(
-                                            text = initials,
-                                            style = MaterialTheme.typography.labelLarge,
-                                            fontWeight = FontWeight.Bold,
-                                            color = MaterialTheme.colorScheme.onPrimaryContainer
-                                        )
-                                    }
-                                }
-                                Spacer(Modifier.width(10.dp))
-                            }
-
-                            Column {
-                                Text(
-                                    text = currentAccount?.let {
-                                        "${it.pupil.firstName} ${it.pupil.surname}"
-                                    } ?: "Brak konta",
-                                    style = MaterialTheme.typography.titleMedium,
-                                    fontWeight = FontWeight.Bold
-                                )
-                                Text(
-                                    text = currentAccount?.unit?.displayName?.ifBlank { currentAccount.unit.name } ?: "",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            }
-
-                            if (enabledStudents.size > 1) {
-                                Spacer(Modifier.width(6.dp))
-                                Icon(
-                                    imageVector = Icons.Default.KeyboardArrowDown,
-                                    contentDescription = "Zmień ucznia",
-                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            }
-                        }
-                    }
+                    Text(
+                        text = pageTitle,
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold
+                    )
                 },
                 actions = {
                     luckyNumber?.let {
@@ -270,22 +232,46 @@ fun DashboardScreen(
                                 modifier = Modifier.padding(end = 8.dp)
                             ) {
                                 Row(
-                                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     Icon(
                                         imageVector = Icons.Outlined.Star,
                                         contentDescription = "Szczęśliwy numerek",
-                                        tint = MaterialTheme.colorScheme.onSecondaryContainer
+                                        tint = MaterialTheme.colorScheme.onSecondaryContainer,
+                                        modifier = Modifier.size(16.dp)
                                     )
-                                    Spacer(Modifier.width(6.dp))
+                                    Spacer(Modifier.width(4.dp))
                                     Text(
                                         text = "${it.number}",
-                                        style = MaterialTheme.typography.labelLarge,
+                                        style = MaterialTheme.typography.labelMedium,
+                                        fontWeight = FontWeight.Bold,
                                         color = MaterialTheme.colorScheme.onSecondaryContainer
                                     )
                                 }
                             }
+                        }
+                    }
+
+                    val initials = currentAccount?.let {
+                        "${it.pupil.firstName.firstOrNull() ?: ""}${it.pupil.surname.firstOrNull() ?: ""}"
+                    } ?: "?"
+
+                    Surface(
+                        onClick = { if (enabledStudents.isNotEmpty()) showStudentBottomSheet = true },
+                        shape = CircleShape,
+                        color = MaterialTheme.colorScheme.primaryContainer,
+                        modifier = Modifier
+                            .padding(end = 12.dp)
+                            .size(40.dp)
+                    ) {
+                        Box(contentAlignment = Alignment.Center) {
+                            Text(
+                                text = initials,
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer
+                            )
                         }
                     }
                 },
