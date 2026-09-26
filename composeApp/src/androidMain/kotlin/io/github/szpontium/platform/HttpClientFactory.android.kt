@@ -5,7 +5,7 @@ import com.chuckerteam.chucker.api.ChuckerInterceptor
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
 
-private var appContext: Context? = null
+internal var appContext: Context? = null
 
 fun initAppContext(context: Context) {
     appContext = context.applicationContext
