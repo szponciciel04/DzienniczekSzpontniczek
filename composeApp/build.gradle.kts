@@ -73,6 +73,7 @@ kotlin {
             implementation(libs.ktor.okhttp)
             implementation(libs.whyoleg.crypto.jdk)
             implementation(libs.androidx.datastore.preferences.android)
+            compileOnly(libs.chucker.library)
         }
         iosMain.dependencies {
             implementation(libs.ktor.darwin)
@@ -115,6 +116,8 @@ android {
 
 dependencies {
     debugImplementation(libs.compose.uiTooling)
+    debugImplementation(libs.chucker.library)
+    releaseImplementation(libs.chucker.library.no.op)
 }
 
 
