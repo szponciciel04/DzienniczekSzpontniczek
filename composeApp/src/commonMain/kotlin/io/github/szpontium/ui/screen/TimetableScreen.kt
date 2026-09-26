@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
@@ -67,7 +68,7 @@ fun TimetableScreen(viewModel: TimetableViewModel = koinViewModel()) {
                 horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 8.dp, vertical = 4.dp)
+                    .padding(horizontal = 16.dp, vertical = 6.dp)
             ) {
                 IconButton(onClick = { viewModel.previousWeek() }) {
                     Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Poprzedni tydzień")
@@ -75,7 +76,8 @@ fun TimetableScreen(viewModel: TimetableViewModel = koinViewModel()) {
                 val weekEnd = state.weekStart.plus(4, DateTimeUnit.DAY)
                 Text(
                     text = "${state.weekStart.day}.${state.weekStart.monthNumber} – ${weekEnd.day}.${weekEnd.monthNumber}",
-                    style = MaterialTheme.typography.titleSmall
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold
                 )
                 IconButton(onClick = { viewModel.nextWeek() }) {
                     Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = "Następny tydzień")
@@ -91,14 +93,14 @@ fun TimetableScreen(viewModel: TimetableViewModel = koinViewModel()) {
             state.schedule.isEmpty() -> EmptyScreen("Brak lekcji w tym tygodniu")
             else -> {
                 val byDay = state.schedule.groupBy { it.date }
-                LazyColumn(modifier = Modifier.fillMaxSize()) {
+                LazyColumn(modifier = Modifier.fillMaxSize().padding(top = 8.dp)) {
                     (0..4).forEach { dayOffset ->
                         val date = state.weekStart.plus(dayOffset, DateTimeUnit.DAY)
                         val lessons = byDay[date] ?: emptyList()
                         if (lessons.isNotEmpty()) {
                             item {
                                 DayHeader(date)
-                                Column(modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)) {
+                                Column(modifier = Modifier.padding(horizontal = 16.dp)) {
                                     lessons.forEachIndexed { index, lesson ->
                                         LessonCard(
                                             lesson = lesson,
@@ -109,7 +111,7 @@ fun TimetableScreen(viewModel: TimetableViewModel = koinViewModel()) {
                                         }
                                     }
                                 }
-                                Spacer(Modifier.height(8.dp))
+                                Spacer(Modifier.height(12.dp))
                             }
                         }
                     }
@@ -123,15 +125,16 @@ fun TimetableScreen(viewModel: TimetableViewModel = koinViewModel()) {
 @Composable
 private fun DayHeader(date: LocalDate) {
     Surface(
-        color = MaterialTheme.colorScheme.surfaceContainerHigh,
-        modifier = Modifier.fillMaxWidth()
+        color = MaterialTheme.colorScheme.secondaryContainer,
+        shape = RoundedCornerShape(12.dp),
+        modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp)
     ) {
         Text(
             text = "${POLISH_DAYS[date.dayOfWeek] ?: date.dayOfWeek.name}, ${date.day}.${date.monthNumber}",
-            style = MaterialTheme.typography.titleSmall,
+            style = MaterialTheme.typography.labelLarge,
             fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+            color = MaterialTheme.colorScheme.onSecondaryContainer,
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
         )
     }
 }
