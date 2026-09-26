@@ -110,9 +110,9 @@ class PrometheusLoginHelper(
         this.followRedirects = followRedirects
 
         install(HttpTimeout) {
-            requestTimeoutMillis = 20000
-            connectTimeoutMillis = 20000
-            socketTimeoutMillis = 20000
+            requestTimeoutMillis = 60000
+            connectTimeoutMillis = 30000
+            socketTimeoutMillis = 30000
         }
         install(HttpCookies) {
             storage = cookieStorage

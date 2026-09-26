@@ -39,7 +39,7 @@ class StartViewModel(
     private fun loadSummary() {
         val account = session.currentAccount ?: return
         val api = session.api ?: return
-        val period = account.periods.firstOrNull { it.current } ?: account.periods.lastOrNull() ?: return
+        val period = account.periods?.firstOrNull { it.current == true } ?: account.periods?.lastOrNull() ?: return
         
         val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
         val dateToday = today.date

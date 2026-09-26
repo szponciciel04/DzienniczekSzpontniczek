@@ -51,14 +51,14 @@ data class Pupil(
 
 @Serializable
 data class Period(
-    @SerialName("Capabilities") val capabilities: List<String>,
+    @SerialName("Capabilities") val capabilities: List<String>? = null,
     @SerialName("Id") val id: Int,
-    @SerialName("Level") val level: Int,
-    @SerialName("Number") val number: Int,
+    @SerialName("Level") val level: Int? = null,
+    @SerialName("Number") val number: Int? = null,
     @SerialName("StartAt") val start: LocalDate,
     @SerialName("EndAt") val end: LocalDate,
-    @SerialName("Current") val current: Boolean,
-    @SerialName("Last") val last: Boolean
+    @SerialName("Current") val current: Boolean? = null,
+    @SerialName("Last") val last: Boolean? = null
 )
 
 @Serializable
@@ -66,13 +66,13 @@ data class Journal(
     @SerialName("Id") val id: Int,
     @SerialName("StartAt") val start: LocalDate,
     @SerialName("EndAt") val end: LocalDate,
-    @SerialName("PupilNumber") val pupilNumber: Int
+    @SerialName("PupilNumber") val pupilNumber: Int? = null
 )
 
 @Serializable
 data class Constraints(
-    @SerialName("AbsenceDaysBefore") val absenceDaysBefore: Int,
-    @SerialName("AbsenceHoursBefore") val absenceHoursBefore: LocalTime,
+    @SerialName("AbsenceDaysBefore") val absenceDaysBefore: Int? = null,
+    @SerialName("AbsenceHoursBefore") val absenceHoursBefore: LocalTime? = null,
     @SerialName("PresenceBlocade") val presenceBlocade: JsonElement? = null
 )
 
@@ -85,8 +85,8 @@ data class AccountMessageBox(
 
 @Serializable
 data class Account(
-    @SerialName("TopLevelPartition") val topLevelPartition: String,
-    @SerialName("Partition") val partition: String,
+    @SerialName("TopLevelPartition") val topLevelPartition: String? = null,
+    @SerialName("Partition") val partition: String? = null,
     @SerialName("Links") val links: AccountLinks,
     @SerialName("ClassDisplay") val classDisplay: String? = null,
     @SerialName("InfoDisplay") val infoDisplay: String? = null,
@@ -97,10 +97,10 @@ data class Account(
     @SerialName("EducatorsList") val educatorsList: List<Address>? = null,
     @SerialName("Pupil") val pupil: Pupil,
     @SerialName("CaretakerId") val caretakerId: Int? = null,
-    @SerialName("Periods") val periods: List<Period>,
+    @SerialName("Periods") val periods: List<Period>? = null,
     @SerialName("Journal") val journal: Journal? = null,
-    @SerialName("Constraints") val constraints: Constraints,
-    @SerialName("State") val state: Int,
+    @SerialName("Constraints") val constraints: Constraints? = null,
+    @SerialName("State") val state: Int? = null,
     @SerialName("MessageBox") val messageBox: AccountMessageBox? = null,
     @SerialName("ProfileId") val profileId: String? = null
 )

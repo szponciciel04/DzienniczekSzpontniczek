@@ -30,7 +30,7 @@ class GradesViewModel(
     fun load() {
         val account = session.currentAccount ?: return
         val api = session.api ?: return
-        val period = account.periods.firstOrNull { it.current } ?: account.periods.lastOrNull() ?: return
+        val period = account.periods?.firstOrNull { it.current == true } ?: account.periods?.lastOrNull() ?: return
 
         viewModelScope.launch {
             _state.value = GradesState(isLoading = true)
