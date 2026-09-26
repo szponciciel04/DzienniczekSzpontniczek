@@ -7,31 +7,31 @@ data class PrometheusMessage(
     val apiGlobalKey: String,
     val data: String,
     val id: Int,
-    val przeczytana: Boolean,
-    val hasZalaczniki: Boolean,
-    val temat: String,
+    val przeczytana: Boolean = false,
+    val hasZalaczniki: Boolean = false,
+    val temat: String = "",
     val korespondenci: String? = null,
 )
 
 @Serializable
 data class PrometheusMessageDetails(
     val apiGlobalKey: String,
-    val data: String,
-    val id: Int,
-    val odczytana: Boolean,
-    val temat: String,
-    val odbiorcy: List<String>,
-    val nadawca: String,
-    val tresc: String,
+    val data: String = "",
+    val id: Int = 0,
+    val odczytana: Boolean = false,
+    val temat: String = "",
+    val odbiorcy: List<String> = emptyList(),
+    val nadawca: String = "",
+    val tresc: String = "",
     val zalaczniki: List<PrometheusAttachment> = emptyList()
 )
 
 @Serializable
 data class PrometheusAttachment(
-    val url: String,
-    val idZalacznik: Int,
-    val nazwaPliku: String,
-    val idOneDrive: String
+    val url: String? = null,
+    val idZalacznik: Int? = null,
+    val nazwaPliku: String? = null,
+    val idOneDrive: String? = null
 )
 
 @Serializable
