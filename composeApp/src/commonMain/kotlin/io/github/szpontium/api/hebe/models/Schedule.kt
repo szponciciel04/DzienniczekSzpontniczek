@@ -81,12 +81,21 @@ val Schedule.isMerge: Boolean
 val Schedule.isRescheduled: Boolean
     get() {
         val sub = substitution ?: return false
-        val subDate = sub.date ?: return false
-        return subDate != date || (sub.timeSlot != null && sub.timeSlot.position != timeSlot.position)
+        val subDate = sub.date
+        return (subDate != null && subDate != date) || (sub.timeSlot != null && sub.timeSlot.position != timeSlot.position)
     }
 
 val Schedule.isReplaced: Boolean
     get() = substitution != null && !isCanceled && !isRescheduled
+
+val Schedule.effectiveDate: LocalDate
+    get() = substitution?.date ?: date
+
+val Schedule.effectivePosition: Int
+    get() = substitution?.timeSlot?.position ?: timeSlot.position
+
+val Schedule.effectiveTimeSlot: Timeslot
+    get() = substitution?.timeSlot ?: timeSlot
 
 val Schedule.effectiveSubject: Subject?
     get() = substitution?.subject ?: subject

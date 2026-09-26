@@ -3,6 +3,8 @@ package io.github.szpontium.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.github.szpontium.api.hebe.models.Schedule
+import io.github.szpontium.api.hebe.models.effectiveDate
+import io.github.szpontium.api.hebe.models.effectivePosition
 import io.github.szpontium.api.hebe.models.isCanceled
 import io.github.szpontium.session.ApiSession
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -40,8 +42,10 @@ data class TimetableState(
 ) {
     val dayLessons: List<Schedule>
         get() {
-            val rawLessonsForDay = schedule.filter { it.date == selectedDate }
-            val byPosition = rawLessonsForDay.groupBy { it.timeSlot.position }
+            val rawLessonsForDay = schedule.filter { lesson ->
+                lesson.effectiveDate == selectedDate
+            }
+            val byPosition = rawLessonsForDay.groupBy { it.effectivePosition }
             val processed = mutableListOf<Schedule>()
 
             for ((_, lessons) in byPosition) {
@@ -53,7 +57,7 @@ data class TimetableState(
                 }
             }
 
-            return processed.sortedBy { it.timeSlot.position }
+            return processed.sortedBy { it.effectivePosition }
         }
 }
 
@@ -120,7 +124,7 @@ class TimetableViewModel(
                 _state.value = _state.value.copy(
                     isLoading = false,
                     schedule = schedule.sortedWith(
-                        compareBy({ it.date }, { it.timeSlot.position })
+                        compareBy({ it.effectiveDate }, { it.effectivePosition })
                     ),
                     error = null
                 )

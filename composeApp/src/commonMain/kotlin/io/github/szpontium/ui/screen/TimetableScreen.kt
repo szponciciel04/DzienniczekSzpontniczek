@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
@@ -38,9 +37,11 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.szpontium.api.hebe.models.Schedule
 import io.github.szpontium.api.hebe.models.effectiveNoteOrReason
+import io.github.szpontium.api.hebe.models.effectivePosition
 import io.github.szpontium.api.hebe.models.effectiveRoom
 import io.github.szpontium.api.hebe.models.effectiveSubject
 import io.github.szpontium.api.hebe.models.effectiveTeacher
+import io.github.szpontium.api.hebe.models.effectiveTimeSlot
 import io.github.szpontium.api.hebe.models.isCanceled
 import io.github.szpontium.api.hebe.models.isMerge
 import io.github.szpontium.api.hebe.models.isRescheduled
@@ -182,6 +183,8 @@ private fun LessonCard(lesson: Schedule, shape: Shape) {
         else -> MaterialTheme.colorScheme.onSurface
     }
 
+    val effectiveTimeSlot = lesson.effectiveTimeSlot
+
     Card(
         shape = shape,
         colors = CardDefaults.cardColors(containerColor = containerColor),
@@ -192,7 +195,7 @@ private fun LessonCard(lesson: Schedule, shape: Shape) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "${lesson.timeSlot.position}",
+                text = "${lesson.effectivePosition}",
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(end = 12.dp)
@@ -251,8 +254,15 @@ private fun LessonCard(lesson: Schedule, shape: Shape) {
                         )
                     }
                     isRescheduled -> {
+                        val originDate = lesson.date
+                        val subDate = lesson.substitution?.date
+                        val rescheduledLabel = if (subDate != null && subDate != originDate) {
+                            "Przeniesiona z ${originDate.day}.${originDate.monthNumber} (lekcja ${lesson.timeSlot.position})"
+                        } else {
+                            "Przeniesiona z lekcji ${lesson.timeSlot.position}"
+                        }
                         Text(
-                            text = "Przeniesiona",
+                            text = rescheduledLabel,
                             style = MaterialTheme.typography.labelSmall,
                             fontWeight = FontWeight.Bold,
                             color = substitutionOnContainerColor
@@ -269,7 +279,7 @@ private fun LessonCard(lesson: Schedule, shape: Shape) {
                 }
             }
             Text(
-                text = "${lesson.timeSlot.start} – ${lesson.timeSlot.end}",
+                text = "${effectiveTimeSlot.start} – ${effectiveTimeSlot.end}",
                 style = MaterialTheme.typography.bodySmall,
                 color = onContainerColor.copy(alpha = 0.88f)
             )
