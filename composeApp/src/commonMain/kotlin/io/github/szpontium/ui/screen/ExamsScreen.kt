@@ -14,7 +14,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
-import androidx.compose.material3.Badge
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -139,10 +138,7 @@ fun ExamCard(exam: Exam, shape: Shape = MaterialTheme.shapes.medium) {
     Card(
         shape = shape,
         colors = CardDefaults.cardColors(
-            containerColor = if (isTest)
-                MaterialTheme.colorScheme.secondaryContainer
-            else
-                MaterialTheme.colorScheme.primaryContainer
+            containerColor = MaterialTheme.colorScheme.surfaceContainerLow
         ),
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -153,35 +149,40 @@ fun ExamCard(exam: Exam, shape: Shape = MaterialTheme.shapes.medium) {
             ) {
                 Text(
                     text = exam.subject.name,
-                    style = MaterialTheme.typography.titleSmall,
+                    style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold,
                     modifier = Modifier.weight(1f)
                 )
-                Badge(
-                    containerColor = if (isTest)
-                        MaterialTheme.colorScheme.secondary
+                Surface(
+                    color = if (isTest)
+                        MaterialTheme.colorScheme.secondaryContainer
                     else
-                        MaterialTheme.colorScheme.primary
+                        MaterialTheme.colorScheme.primaryContainer,
+                    shape = RoundedCornerShape(8.dp)
                 ) {
-                    Text(exam.type, style = MaterialTheme.typography.labelSmall)
+                    Text(
+                        text = exam.type,
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = if (isTest)
+                            MaterialTheme.colorScheme.onSecondaryContainer
+                        else
+                            MaterialTheme.colorScheme.onPrimaryContainer,
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                    )
                 }
             }
-            Spacer(Modifier.height(4.dp))
             if (exam.content.isNotBlank()) {
+                Spacer(Modifier.height(6.dp))
                 Text(
                     text = exam.content,
                     style = MaterialTheme.typography.bodyMedium
                 )
-                Spacer(Modifier.height(4.dp))
             }
+            Spacer(Modifier.height(6.dp))
             val deadlineDate = exam.deadline
             Text(
-                text = "Termin: ${deadlineDate.day}.${deadlineDate.monthNumber}.${deadlineDate.year}",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            Text(
-                text = "Nauczyciel: ${exam.creator.displayName}",
+                text = "Termin: ${deadlineDate.day}.${deadlineDate.monthNumber}.${deadlineDate.year} · ${exam.creator.displayName}",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
